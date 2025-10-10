@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Icons -->
+    <link rel="icon" href="/pwa-192.png" />
+<link rel="apple-touch-icon" href="/pwa-192.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+
+
+    <!-- PWA manifest (vite-plugin-pwa will also inject one; keeping this is fine) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="white-translucent" />
+
+    <!-- OG -->
+    <meta property="og:title" content="One More Day" />
+    <meta property="og:description" content="One More Day — drop notes and photos on the map." />
+    <meta property="og:image" content="/pwa-512.png" />
+    <meta property="og:type" content="website" />
+
+    <title>One More Day</title>
+  </head>
+  <body class="min-h-screen bg-background text-text antialiased">
+    <!-- 🔑 React will mount here -->
+    <div id="root"></div>
+
+    <!-- Vite dev entry; Vite swaps this to the built bundle in dist -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
