@@ -95,7 +95,7 @@ export default function CommentsSection({ pinId, userId }) {
   }
 
   return (
-    <div className="mt-3 border-t pt-2">
+    <div className="mt-2 border-t pt-2">
       {/* Button expand*/}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -111,7 +111,7 @@ export default function CommentsSection({ pinId, userId }) {
 
       {/* Section expanded */}
       {expanded && (
-        <div className="mt-2 space-y-2 transition-all">
+        <div className="mt-1 space-y-2 transition-all">
           {loading ? (
             <p className="text-sm text-neutral-500">Load comments...</p>
           ) : comments.length === 0 ? (

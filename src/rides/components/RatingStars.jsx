@@ -63,7 +63,7 @@ export default function RatingStars({ pinId, userId }) {
   }
 
   return (
-    <div className="flex flex-col gap-1 mt-3">
+    <div className="flex flex-col gap-1 mt-1">
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((i) => (
           <button

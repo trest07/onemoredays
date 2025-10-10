@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import {
-  fetchMyDropsWithStats,  // ← stats view so the badges show
+  fetchMyDropsWithStats, // ← stats view so the badges show
   updateDrop,
   deleteDrop,
 } from "@/rides/lib/drops";
+import RatingStars from "../../components/RatingStars";
+import CommentsSection from "../../components/CommentsSection";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
 function Item({ d, onDelete, onEdit }) {
@@ -77,6 +79,15 @@ function Item({ d, onDelete, onEdit }) {
             </span>
           </div>
         </div>
+
+        <div className="flex justify-between">
+          <div>{/* spacing */}</div>
+          {/* Rating */}
+          <RatingStars pinId={d.id} userId={d.user_id} />
+        </div>
+
+        {/* Comments */}
+        <CommentsSection pinId={d.id} userId={d.user_id} />
       </div>
     </div>
   );
@@ -85,7 +96,9 @@ function Item({ d, onDelete, onEdit }) {
 /* ---------- Tiny modal for editing the note ---------- */
 function EditNoteModal({ open, initialNote = "", onClose, onSave, saving }) {
   const [val, setVal] = useState(initialNote || "");
-  useEffect(() => { if (open) setVal(initialNote || ""); }, [open, initialNote]);
+  useEffect(() => {
+    if (open) setVal(initialNote || "");
+  }, [open, initialNote]);
   if (!open) return null;
 
   return (
@@ -151,7 +164,10 @@ export default function MyDrops() {
         const { data: u, error } = await supabase.auth.getUser();
         if (error) throw error;
         const userId = u?.user?.id;
-        if (!userId) { setRows([]); return; }
+        if (!userId) {
+          setRows([]);
+          return;
+        }
         const data = await fetchMyDropsWithStats({ userId });
         setRows(data ?? []);
       } catch (e) {
@@ -181,7 +197,9 @@ export default function MyDrops() {
     try {
       setSaving(true);
       const updated = await updateDrop(editing.id, { note: noteText || null });
-      setRows((xs) => xs.map((x) => (x.id === editing.id ? { ...x, ...updated } : x)));
+      setRows((xs) =>
+        xs.map((x) => (x.id === editing.id ? { ...x, ...updated } : x))
+      );
       setEditing(null);
     } catch (e) {
       alert(e?.message || "Failed to update");
@@ -190,9 +208,15 @@ export default function MyDrops() {
     }
   }
 
-  if (loading) return <div className="p-4 text-sm text-neutral-600">Loading…</div>;
+  if (loading)
+    return <div className="p-4 text-sm text-neutral-600">Loading…</div>;
   if (err) return <div className="p-4 text-sm text-red-600">{err}</div>;
-  if (!rows.length) return <div className="p-4 text-sm text-neutral-600">You haven’t posted any drops yet.</div>;
+  if (!rows.length)
+    return (
+      <div className="p-4 text-sm text-neutral-600">
+        You haven’t posted any drops yet.
+      </div>
+    );
 
   return (
     <div className={deletingId ? "opacity-50" : ""}>
