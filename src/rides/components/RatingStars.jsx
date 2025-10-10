@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
 
-export default function RatingStars({ dropId, userId }) {
+export default function RatingStars({ pinId, userId }) {
   const [rating, setRating] = useState(0);
   const [avgRating, setAvgRating] = useState(0);
   const [count, setCount] = useState(0);
   const [hover, setHover] = useState(0);
 
   useEffect(() => {
-    if (!dropId) return;
+    if (!pinId) return;
     (async () => {
       const { data: ratings } = await supabase
-        .from("drop_ratings")
+        .schema("omd")
+        .from("pin_ratings")
         .select("rating")
-        .eq("drop_id", dropId);
+        .eq("pin_id", pinId);
 
       if (ratings?.length) {
         const total = ratings.reduce((acc, r) => acc + r.rating, 0);
@@ -23,30 +24,36 @@ export default function RatingStars({ dropId, userId }) {
 
       if (userId) {
         const { data: my } = await supabase
-          .from("drop_ratings")
+          .schema("omd")
+          .from("pin_ratings")
           .select("rating")
-          .eq("drop_id", dropId)
+          .eq("pin_id", pinId)
           .eq("user_id", userId)
           .single();
         if (my) setRating(my.rating);
       }
     })();
-  }, [dropId, userId]);
+  }, [pinId, userId]);
 
   async function handleRate(value) {
     if (!userId) return alert("Sign in to rate");
     setRating(value);
 
     const { error } = await supabase
-      .from("drop_ratings")
-      .upsert({ drop_id: dropId, user_id: userId, rating: value }, { onConflict: "drop_id,user_id" });
+      .schema("omd")
+      .from("pin_ratings")
+      .upsert(
+        { pin_id: pinId, user_id: userId, rating: value },
+        { onConflict: "pin_id,user_id" }
+      );
 
     if (error) console.error(error);
     else {
       const { data: ratings } = await supabase
-        .from("drop_ratings")
+        .schema("omd")
+        .from("pin_ratings")
         .select("rating")
-        .eq("drop_id", dropId);
+        .eq("pin_id", pinId);
       if (ratings?.length) {
         const total = ratings.reduce((acc, r) => acc + r.rating, 0);
         setAvgRating(total / ratings.length);
@@ -66,7 +73,11 @@ export default function RatingStars({ dropId, userId }) {
             onMouseLeave={() => setHover(0)}
             className="text-2xl focus:outline-none"
           >
-            <span className={(hover || rating) >= i ? "text-yellow-400" : "text-neutral-300"}>
+            <span
+              className={
+                (hover || rating) >= i ? "text-yellow-400" : "text-neutral-300"
+              }
+            >
               ★
             </span>
           </button>

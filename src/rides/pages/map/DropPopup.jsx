@@ -448,10 +448,10 @@ export default function DropPopup({
       </div>
 
       {/* Rating */}
-      <RatingStars dropId={id} userId={uid} />
+      <RatingStars pinId={id} userId={uid} />
 
       {/* Comments */}
-      <CommentsSection dropId={id} userId={uid} />
+      <CommentsSection pinId={id} userId={uid} />
 
       {/* Lightbox */}
       {lightboxOpen && (
