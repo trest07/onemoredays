@@ -19,7 +19,8 @@ import {
   restroomIcon as _restroomIcon,
   restaurantIcon as _restaurantIcon,
   gasStationIcon as _gasStationIcon,
-  publicParkIcon as _publicParkIcon
+  publicParkIcon as _publicParkIcon,
+  moneyExchangeIcon as _moneyExchangeIcon
 } from "./icons";
 import MapControls from "./MapControls.jsx";
 import { supabase } from "@/supabaseClient";
@@ -116,6 +117,7 @@ const restroomIcon    = _restroomIcon    || noteMarkerIcon;
 const restaurantIcon  = _restaurantIcon  || noteMarkerIcon;
 const gasStationIcon  = _gasStationIcon  || noteMarkerIcon;
 const publicParkIcon  = _publicParkIcon  || noteMarkerIcon;
+const moneyExchangeIcon  = _moneyExchangeIcon  || noteMarkerIcon;
 
 function getMarkerIconForDrop(d) {
   const t = (d?.note || "").toLowerCase();
@@ -127,6 +129,7 @@ function getMarkerIconForDrop(d) {
     if (/(^|\s)#?(restaurant|food|eat|diner|tacos)\b/.test(t)) return restaurantIcon;
     if (/(^|\s)#?(gas|gasstation|fuel|diesel)\b/.test(t)) return gasStationIcon;
     if (/(^|\s)#?(park|publicpark)\b/.test(t)) return publicParkIcon;
+    if (/(^|\s)#?(money|moneyexchange)\b/.test(t)) return moneyExchangeIcon;
   } catch {}
   if (d?.image_url || d?.media_url) return cameraMarkerIcon;
   if (d?.note) return noteMarkerIcon;
