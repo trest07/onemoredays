@@ -105,6 +105,8 @@ export default function PinComposer({
   const restOn  = useMemo(() => hasTag(note, "#restroom"), [note]);
   const truckOn = useMemo(() => hasTag(note, "#truckstop") || hasTag(note, "#18wheeler"), [note]);
   const foodOn  = useMemo(() => hasTag(note, "#restaurant"), [note]);
+  const parkOn  = useMemo(() => hasTag(note, "#publicpark"), [note]);
+  const gasOn  = useMemo(() => hasTag(note, "#gasstation"), [note]);
 
   return (
     <div
@@ -163,7 +165,7 @@ export default function PinComposer({
               ref={taRef}
               className="w-full resize-y rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/10"
               rows={4}
-              placeholder="Say something about this spot… add tags like #restroom #petfriendly #truckstop #restaurant"
+              placeholder="Say something about this spot… add tags like #restroom #petfriendly #truckstop #restaurant #publicpark #gasstation"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               style={{ fontSize: 17, lineHeight: 1.55 }}
@@ -202,6 +204,14 @@ export default function PinComposer({
               <label className="flex items-center gap-3 text-[16px]">
                 <input type="checkbox" className="h-5 w-5" checked={foodOn} onChange={(e) => onToggle("#restaurant", e.target.checked)} />
                 <span>Restaurant</span>
+              </label>
+              <label className="flex items-center gap-3 text-[16px]">
+                <input type="checkbox" className="h-5 w-5" checked={parkOn} onChange={(e) => onToggle("#publicpark", e.target.checked)} />
+                <span>Public Park</span>
+              </label>
+              <label className="flex items-center gap-3 text-[16px]">
+                <input type="checkbox" className="h-5 w-5" checked={gasOn} onChange={(e) => onToggle("#gasstation", e.target.checked)} />
+                <span>Gas Station</span>
               </label>
             </div>
           </section>

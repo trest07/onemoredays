@@ -19,6 +19,7 @@ import {
   restroomIcon as _restroomIcon,
   restaurantIcon as _restaurantIcon,
   gasStationIcon as _gasStationIcon,
+  publicParkIcon as _publicParkIcon
 } from "./icons";
 import MapControls from "./MapControls.jsx";
 import { supabase } from "@/supabaseClient";
@@ -114,6 +115,7 @@ const kidsFriendlyIcon= _kidsFriendlyIcon|| noteMarkerIcon;
 const restroomIcon    = _restroomIcon    || noteMarkerIcon;
 const restaurantIcon  = _restaurantIcon  || noteMarkerIcon;
 const gasStationIcon  = _gasStationIcon  || noteMarkerIcon;
+const publicParkIcon  = _publicParkIcon  || noteMarkerIcon;
 
 function getMarkerIconForDrop(d) {
   const t = (d?.note || "").toLowerCase();
@@ -124,6 +126,7 @@ function getMarkerIconForDrop(d) {
     if (/(^|\s)#?(restroom|bathroom|toilet|wc)\b/.test(t)) return restroomIcon;
     if (/(^|\s)#?(restaurant|food|eat|diner|tacos)\b/.test(t)) return restaurantIcon;
     if (/(^|\s)#?(gas|gasstation|fuel|diesel)\b/.test(t)) return gasStationIcon;
+    if (/(^|\s)#?(park|publicpark)\b/.test(t)) return publicParkIcon;
   } catch {}
   if (d?.image_url || d?.media_url) return cameraMarkerIcon;
   if (d?.note) return noteMarkerIcon;
@@ -355,6 +358,7 @@ export default function MapView() {
                         authorBio={d.bio || d.profiles?.bio}
                         authorPostsCount={d.posts_count ?? d.profiles?.posts_count ?? 0}
                         authorNotesCount={d.notes_count ?? d.profiles?.notes_count ?? 0}
+                        iconUrl={getMarkerIconForDrop(d)?.options?.html}
                       />
                     </Popup>
                   </Marker>

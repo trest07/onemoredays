@@ -163,3 +163,22 @@ export const gasStationIcon = L.divIcon({
     </div>
   `,
 });
+
+/** NEW: Public park */
+export const publicParkIcon = L.divIcon({
+  className: "omd-park",
+  iconSize: [26, 26],
+  iconAnchor: [13, 26],
+  html: `
+    <div style="position:relative;width:22px;height:22px;transform:translateY(2px);">
+      <div style="position:absolute;left:10px;bottom:-6px;width:2px;height:8px;background:#43ed52ff;border-radius:2px;opacity:.9;"></div>
+      <div style="width:22px;height:22px;border-radius:50%;
+          background:linear-gradient(180deg,#22d3ee 0%, #43ed52ff 100%);
+          box-shadow:0 1px 2px rgba(0,0,0,.35);
+          display:flex;align-items:center;justify-content:center;
+          font-size:13px;">
+        ️🏞️
+      </div>
+    </div>
+  `,
+});
