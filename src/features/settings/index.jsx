@@ -6,6 +6,7 @@ import AccountSettings from "./AccountSettings";
 // ✅ use the EDITABLE MyDrops (has Edit/Delete)
 import MyDrops from "@/rides/pages/settings/MyDrops.jsx";
 import TopPostersWidget from "@/rides/pages/settings/TopPostersWidget.jsx";
+import ConnectionsTab from "../../profile/components/ConnectionsTab";
 
 export default function Settings() {
   const [tab, setTab] = useState("profile");
@@ -20,6 +21,7 @@ export default function Settings() {
     { key: "profile", label: "Profile" },
     { key: "account", label: "Account" },
     { key: "drops", label: "My Drops" },
+    { key: "connections", label: "Connections" },
   ];
 
   return (
@@ -56,9 +58,11 @@ export default function Settings() {
         </>
       )}
 
-      {tab !== "profile" && tab !== "account" && tab !== "drops" && (
+      {tab !== "profile" && tab !== "account" && tab !== "drops" && tab !== "connections" && (
         <div className="text-sm opacity-70">Coming soon</div>
       )}
+
+      {tab === "connections" && <ConnectionsTab/>}
     </div>
   );
 }

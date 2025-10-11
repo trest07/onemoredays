@@ -27,6 +27,7 @@ export default function InlineProfileCard({ open, profile, onClose }) {
           subtitle={profile?.bio || "Member"}
           postsCount={profile?.postsCount ?? 0}
           notesCount={profile?.notesCount ?? 0}
+          profileId={profile?.id}
           actionLabel="Close"
           onAction={onClose}
           onClick={onClose}
