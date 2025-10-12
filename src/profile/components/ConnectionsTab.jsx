@@ -6,6 +6,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../../components/tabs";
+import InlineProfileCard from "../../rides/components/InlineProfileCard";
 
 // Simple card for a user
 function UserCard({
@@ -18,6 +19,7 @@ function UserCard({
   setLoading,
 }) {
   const [followStatus, setFollowStatus] = useState("none");
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     const loadFollowStatus = async () => {
@@ -85,17 +87,23 @@ function UserCard({
   return (
     <div className="flex items-center justify-between p-2 shadow rounded-md">
       <div className="flex items-center gap-3">
-        <img
-          src={user.avatar_url || "/avatar.jpg"}
-          alt={user.username}
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <div>
-          <p className="font-medium text-sm">{user.username}</p>
-          {user.status && (
-            <p className="text-xs text-neutral-500">{user.status}</p>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={() => setProfileOpen(true)}
+          className="flex items-center gap-2 focus:outline-none"
+        >
+          <img
+            src={user.avatar_url || "/avatar.jpg"}
+            alt={user.username}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <p className="font-medium text-sm">{user.username}</p>
+            {user.status && (
+              <p className="text-xs text-neutral-500">{user.status}</p>
+            )}
+          </div>
+        </button>
       </div>
       <div className="flex justify-between p-2 border-b gap-4">
         {onAccept && (
@@ -140,6 +148,23 @@ function UserCard({
           </button>
         )}
       </div>
+
+      {/* Profile modal */}
+      <InlineProfileCard
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        profile={{
+          id: user.id,
+          display_name: user.display_name || user.username,
+          username: user.username,
+          photo_url:
+            user.avatar_url ||
+            user.profiles?.avatar_url ||
+            user.photo_url ||
+            "/avatar.jpg",
+          bio: user.bio || "",
+        }}
+      />
     </div>
   );
 }
@@ -151,11 +176,6 @@ export default function ConnectionsTab() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [userId, setUserId] = useState("");
-
-  //   useEffect(() => {
-  //     if (!userId) return;
-  //     loadConnections();
-  //   }, [userId]);
 
   useEffect(() => {
     (async () => {
@@ -321,7 +341,11 @@ export default function ConnectionsTab() {
         <TabsContent value="following">
           {following.length ? (
             following.map((f) => (
-              <UserCard key={f.username} user={f} onRemove={handleRemoveFollowing}/>
+              <UserCard
+                key={f.username}
+                user={f}
+                onRemove={handleRemoveFollowing}
+              />
             ))
           ) : (
             <p className="text-sm text-neutral-500 text-center py-4">

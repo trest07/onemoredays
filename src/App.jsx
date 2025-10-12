@@ -11,6 +11,7 @@ const MapView = lazy(() => import("@/rides/pages/map/MapView.jsx"));
 
 // Settings
 const SettingsHome    = lazy(() => import("@/features/settings/index.jsx"));
+const ActivityHome    = lazy(() => import("@/features/activity/index.jsx"));
 const ProfileSettings = lazy(() => import("@/features/settings/ProfileSettings.jsx"));
 const AccountSettings = lazy(() => import("@/features/settings/AccountSettings.jsx"));
 
@@ -51,12 +52,15 @@ export default function App() {
             <Route path="/settings" element={<SettingsHome />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/account" element={<AccountSettings />} />
-            <Route path="/settings/drops" element={<MyDrops />} /> {/* 👈 uses existing MyDrops */}
 
             {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/reset" element={<Reset />} />
+
+            {/* Activity */}
+            <Route path="/activity" element={<ActivityHome />} />
+            <Route path="/activity/drops" element={<MyDrops />} /> {/* 👈 uses existing MyDrops */}
 
             {/* Default & fallback */}
             <Route path="/" element={<Navigate to="/rides/map" replace />} />

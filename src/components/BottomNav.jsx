@@ -42,12 +42,14 @@ function InnerNav() {
   const icons = {
     map: "M9 3l-6 2v16l6-2 6 2 6-2V3l-6 2-6-2zM9 5v14M15 7v14",
     toggle: "M4 12h16M7 8a4 4 0 1 1 0 8",
+    activity: "M3 12h3l2 7l4-14l4 14l2-7h3"
   };
 
   // Only 2 tabs now
   const tabs = [
     { to: "/rides/map", label: "Map", icon: icons.map, isRoot: true },
-    { to: "/settings", label: "Settings", icon: icons.toggle },
+    { to: "/activity", label: "Activity", icon: icons.activity },
+    { to: "/settings", label: "Settings", icon: icons.toggle },    
   ];
 
   return (
@@ -68,7 +70,7 @@ function InnerNav() {
       onMouseDownCapture={(e) => e.stopPropagation()}
     >
       <div className="mx-auto w-full max-w-5xl">
-        <div className="mx-4 rounded-2xl border border-gray-200 bg-white shadow-lg px-2 py-2 grid grid-cols-2 gap-1">
+        <div className="mx-4 rounded-2xl border border-gray-200 bg-white shadow-lg px-2 py-2 grid grid-cols-3 gap-1">
           {tabs.map((t) => (
             <Tab key={t.to} to={t.to} label={t.label} icon={t.icon} isRoot={t.isRoot} />
           ))}

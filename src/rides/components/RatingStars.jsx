@@ -29,7 +29,7 @@ export default function RatingStars({ pinId, userId }) {
           .select("rating")
           .eq("pin_id", pinId)
           .eq("user_id", userId)
-          .single();
+          .maybeSingle();
         if (my) setRating(my.rating);
       }
     })();
