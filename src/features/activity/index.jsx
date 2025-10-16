@@ -1,20 +1,19 @@
 // src/features/settings/index.jsx
 import { useEffect, useState } from "react";
-import ProfileSettings from "./ProfileSettings";
-import AccountSettings from "./AccountSettings";
 
-export default function Settings() {
-  const [tab, setTab] = useState("profile");
+// ✅ use the EDITABLE MyDrops (has Edit/Delete)
+import MyDrops from "@/rides/pages/settings/MyDrops.jsx";
+import TopPostersWidget from "@/rides/pages/settings/TopPostersWidget.jsx";
+import ConnectionsTab from "../../profile/components/ConnectionsTab";
+import ProfilePhotos from "../../profile/components/ProfilePhotos";
 
-  useEffect(() => {
-    console.log("[Settings] mounted");
-    return () => console.log("[Settings] unmounted");
-  }, []);
+export default function Activity() {
+  const [tab, setTab] = useState("drops");
 
   const tabs = [
-    { key: "privacy", label: "Privacy", disabled: true },
-    { key: "profile", label: "Profile" },
-    { key: "account", label: "Account" }
+    { key: "drops", label: "My Drops" },
+    { key: "photos", label: "My Photos" },
+    { key: "connections", label: "Connections" },
   ];
 
   return (
@@ -40,12 +39,16 @@ export default function Settings() {
         ))}
       </div>
 
-      {tab === "profile" && <ProfileSettings />}
-      {tab === "account" && <AccountSettings />}
-
-      {tab !== "profile" && tab !== "account" && (
-        <div className="text-sm opacity-70">Coming soon</div>
+      {tab === "drops" && (
+        <>
+          <MyDrops /> {/* ← now shows Edit/Delete */}
+          <hr className="my-6 border-neutral-200" />
+          <TopPostersWidget limit={5} />
+        </>
       )}
+
+      {tab === "connections" && <ConnectionsTab/>}
+      {tab === "photos" && <ProfilePhotos/>}
     </div>
   );
 }

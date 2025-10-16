@@ -2,13 +2,15 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import {
-  fetchMyDropsWithStats,  // ← stats view so the badges show
+  fetchMyDropsWithStats, // ← stats view so the badges show
   updateDrop,
   deleteDrop,
 } from "@/rides/lib/drops";
+import RatingStars from "../../components/RatingStars";
+import CommentsSection from "../../components/CommentsSection";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
-function Item({ d, onDelete, onEdit }) {
+export function Item({ d, onDelete, onEdit, userId }) {
   const thumb =
     (Array.isArray(d.media_urls) && d.media_urls[0]) ||
     d.image_url ||
@@ -48,22 +50,26 @@ function Item({ d, onDelete, onEdit }) {
 
         {/* Buttons + stats row */}
         <div className="mt-2 flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => onEdit(d)}
-            className="px-2 py-1 text-xs rounded-lg border text-neutral-700 hover:bg-gray-50"
-            title="Edit drop"
-            type="button"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => onDelete(d.id)}
-            className="px-2 py-1 text-xs rounded-lg border border-red-300 text-red-700 hover:bg-red-50"
-            title="Delete drop"
-            type="button"
-          >
-            Delete
-          </button>
+          {onEdit && (
+            <button
+              onClick={() => onEdit(d)}
+              className="px-2 py-1 text-xs rounded-lg border text-neutral-700 hover:bg-gray-50"
+              title="Edit drop"
+              type="button"
+            >
+              Edit
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(d.id)}
+              className="px-2 py-1 text-xs rounded-lg border border-red-300 text-red-700 hover:bg-red-50"
+              title="Delete drop"
+              type="button"
+            >
+              Delete
+            </button>
+          )}
 
           <div className="ml-auto flex items-center gap-2 text-[11px]">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border bg-white">
@@ -77,6 +83,15 @@ function Item({ d, onDelete, onEdit }) {
             </span>
           </div>
         </div>
+
+        <div className="flex justify-between">
+          <div>{/* spacing */}</div>
+          {/* Rating */}
+          <RatingStars pinId={d.id} userId={userId} />
+        </div>
+
+        {/* Comments */}
+        <CommentsSection pinId={d.id} userId={userId} />
       </div>
     </div>
   );
@@ -85,7 +100,9 @@ function Item({ d, onDelete, onEdit }) {
 /* ---------- Tiny modal for editing the note ---------- */
 function EditNoteModal({ open, initialNote = "", onClose, onSave, saving }) {
   const [val, setVal] = useState(initialNote || "");
-  useEffect(() => { if (open) setVal(initialNote || ""); }, [open, initialNote]);
+  useEffect(() => {
+    if (open) setVal(initialNote || "");
+  }, [open, initialNote]);
   if (!open) return null;
 
   return (
@@ -151,7 +168,10 @@ export default function MyDrops() {
         const { data: u, error } = await supabase.auth.getUser();
         if (error) throw error;
         const userId = u?.user?.id;
-        if (!userId) { setRows([]); return; }
+        if (!userId) {
+          setRows([]);
+          return;
+        }
         const data = await fetchMyDropsWithStats({ userId });
         setRows(data ?? []);
       } catch (e) {
@@ -181,7 +201,9 @@ export default function MyDrops() {
     try {
       setSaving(true);
       const updated = await updateDrop(editing.id, { note: noteText || null });
-      setRows((xs) => xs.map((x) => (x.id === editing.id ? { ...x, ...updated } : x)));
+      setRows((xs) =>
+        xs.map((x) => (x.id === editing.id ? { ...x, ...updated } : x))
+      );
       setEditing(null);
     } catch (e) {
       alert(e?.message || "Failed to update");
@@ -190,9 +212,15 @@ export default function MyDrops() {
     }
   }
 
-  if (loading) return <div className="p-4 text-sm text-neutral-600">Loading…</div>;
+  if (loading)
+    return <div className="p-4 text-sm text-neutral-600">Loading…</div>;
   if (err) return <div className="p-4 text-sm text-red-600">{err}</div>;
-  if (!rows.length) return <div className="p-4 text-sm text-neutral-600">You haven’t posted any drops yet.</div>;
+  if (!rows.length)
+    return (
+      <div className="p-4 text-sm text-neutral-600">
+        You haven’t posted any drops yet.
+      </div>
+    );
 
   return (
     <div className={deletingId ? "opacity-50" : ""}>
@@ -203,6 +231,7 @@ export default function MyDrops() {
             d={d}
             onEdit={(row) => setEditing(row)}
             onDelete={onDelete}
+            userId={userId}
           />
         ))}
       </div>

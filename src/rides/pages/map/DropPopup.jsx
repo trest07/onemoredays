@@ -2,11 +2,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import {
-  getVote, setVote, getVoteCounts,
-  recordView, getViewCount
+  getVote,
+  setVote,
+  getVoteCounts,
+  recordView,
+  getViewCount,
 } from "@/rides/lib/drops"; // note the absolute alias
 import MediaLightbox from "@/rides/pages/map/ui/MediaLightbox.jsx";
 import InlineProfileCard from "@/rides/components/InlineProfileCard.jsx";
+
+import RatingStars from "@/rides/components/RatingStars.jsx";
+import CommentsSection from "@/rides/components/CommentsSection.jsx";
 
 /* ------------------------------ utils ------------------------------ */
 
@@ -54,11 +60,13 @@ function Carousel({ items = [], onOpenLightbox }) {
 
   if (!count) return null;
 
-  const next = () => setIdx(i => Math.min(i + 1, count - 1));
-  const prev = () => setIdx(i => Math.max(i - 1, 0));
+  const next = () => setIdx((i) => Math.min(i + 1, count - 1));
+  const prev = () => setIdx((i) => Math.max(i - 1, 0));
 
-  const onTouchStart = (e) => { startXRef.current = e.touches?.[0]?.clientX ?? null; };
-  const onTouchMove  = (e) => {
+  const onTouchStart = (e) => {
+    startXRef.current = e.touches?.[0]?.clientX ?? null;
+  };
+  const onTouchMove = (e) => {
     const x0 = startXRef.current;
     if (x0 == null) return;
     const dx = e.touches?.[0]?.clientX - x0;
@@ -67,7 +75,9 @@ function Carousel({ items = [], onOpenLightbox }) {
       startXRef.current = null;
     }
   };
-  const onTouchEnd = () => { startXRef.current = null; };
+  const onTouchEnd = () => {
+    startXRef.current = null;
+  };
 
   const cur = items[idx];
   const isVideo = /\.(mp4|webm|ogg)$/i.test(cur);
@@ -80,9 +90,18 @@ function Carousel({ items = [], onOpenLightbox }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <button type="button" onClick={() => onOpenLightbox(cur)} className="absolute inset-0">
+        <button
+          type="button"
+          onClick={() => onOpenLightbox(cur)}
+          className="absolute inset-0"
+        >
           {isVideo ? (
-            <video src={cur} className="w-full h-full object-cover" muted playsInline />
+            <video
+              src={cur}
+              className="w-full h-full object-cover"
+              muted
+              playsInline
+            />
           ) : (
             <img
               src={cur}
@@ -115,7 +134,12 @@ function Carousel({ items = [], onOpenLightbox }) {
           </button>
           <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
             {items.map((_, i) => (
-              <span key={i} className={`inline-block w-1.5 h-1.5 rounded-full ${i === idx ? "bg-black" : "bg-black/30"}`} />
+              <span
+                key={i}
+                className={`inline-block w-1.5 h-1.5 rounded-full ${
+                  i === idx ? "bg-black" : "bg-black/30"
+                }`}
+              />
             ))}
           </div>
         </>
@@ -128,8 +152,8 @@ function Carousel({ items = [], onOpenLightbox }) {
 
 export default function DropPopup({
   id,
-  media_url,               // legacy single
-  media_urls,              // array (optional)
+  media_url, // legacy single
+  media_urls, // array (optional)
   note,
   authorName,
   authorPhoto,
@@ -139,6 +163,7 @@ export default function DropPopup({
   authorUsername,
   authorPostsCount = 0,
   authorNotesCount = 0,
+  iconUrl = null,
 }) {
   const [uid, setUid] = useState(null);
   const [myVote, setMyVote] = useState(0);
@@ -208,7 +233,9 @@ export default function DropPopup({
         /* ignore */
       }
     })();
-    return () => { on = false; };
+    return () => {
+      on = false;
+    };
   }, [id]);
 
   async function handleVote(next) {
@@ -217,20 +244,20 @@ export default function DropPopup({
     const nextVal = next === old ? 0 : next;
 
     // optimistic UI
-    if (old === 1) setUp(c => c - 1);
-    if (old === -1) setDown(c => c - 1);
-    if (nextVal === 1) setUp(c => c + 1);
-    if (nextVal === -1) setDown(c => c + 1);
+    if (old === 1) setUp((c) => c - 1);
+    if (old === -1) setDown((c) => c - 1);
+    if (nextVal === 1) setUp((c) => c + 1);
+    if (nextVal === -1) setDown((c) => c + 1);
     setMyVote(nextVal);
 
     try {
       await setVote(id, nextVal); // uses correct onConflict order in lib
     } catch (e) {
       // revert on failure
-      if (nextVal === 1) setUp(c => c - 1);
-      if (nextVal === -1) setDown(c => c - 1);
-      if (old === 1) setUp(c => c + 1);
-      if (old === -1) setDown(c => c + 1);
+      if (nextVal === 1) setUp((c) => c - 1);
+      if (nextVal === -1) setDown((c) => c - 1);
+      if (old === 1) setUp((c) => c + 1);
+      if (old === -1) setDown((c) => c + 1);
       setMyVote(old);
       alert(e?.message || "Failed to vote");
     }
@@ -239,7 +266,9 @@ export default function DropPopup({
   function hidePin() {
     setHidden(true);
     setMenuOpen(false);
-    try { window.dispatchEvent(new CustomEvent("omd:hide-pin", { detail: { id } })); } catch {}
+    try {
+      window.dispatchEvent(new CustomEvent("omd:hide-pin", { detail: { id } }));
+    } catch {}
   }
 
   async function reportPin() {
@@ -269,13 +298,21 @@ export default function DropPopup({
 
   // Fallback single media type detection (if not using the carousel)
   const singleMediaType = media_url
-    ? (/\.(mp4|webm|ogg)$/i.test(media_url) ? "video" : "image")
+    ? /\.(mp4|webm|ogg)$/i.test(media_url)
+      ? "video"
+      : "image"
     : null;
 
   return (
     <div className="relative w-[260px] max-w-[80vw]">
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
+        {iconUrl && (
+          <div
+            className="w-6 h-5 flex-shrink-0 self-start"
+            dangerouslySetInnerHTML={{ __html: iconUrl }}
+          />
+        )}
         <button
           type="button"
           onClick={() => setProfileOpen(true)}
@@ -297,7 +334,7 @@ export default function DropPopup({
           <button
             type="button"
             className="p-1 text-neutral-500 hover:text-neutral-800"
-            onClick={() => setMenuOpen(v => !v)}
+            onClick={() => setMenuOpen((v) => !v)}
             aria-label="More actions"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -308,10 +345,16 @@ export default function DropPopup({
           </button>
           {menuOpen && (
             <div className="absolute right-0 mt-1 w-28 bg-white border rounded shadow text-sm z-50">
-              <button className="block w-full text-left px-3 py-1 hover:bg-gray-100" onClick={hidePin}>
+              <button
+                className="block w-full text-left px-3 py-1 hover:bg-gray-100"
+                onClick={hidePin}
+              >
                 Hide
               </button>
-              <button className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-red-600" onClick={reportPin}>
+              <button
+                className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-red-600"
+                onClick={reportPin}
+              >
                 Report
               </button>
             </div>
@@ -323,17 +366,28 @@ export default function DropPopup({
       {gallery.length > 0 ? (
         <Carousel
           items={gallery}
-          onOpenLightbox={(src) => { setLightboxSrc(src); setLightboxOpen(true); }}
+          onOpenLightbox={(src) => {
+            setLightboxSrc(src);
+            setLightboxOpen(true);
+          }}
         />
       ) : media_url ? (
         <div className="mb-2 overflow-hidden rounded-lg border">
           <button
             type="button"
-            onClick={() => { setLightboxSrc(media_url); setLightboxOpen(true); }}
+            onClick={() => {
+              setLightboxSrc(media_url);
+              setLightboxOpen(true);
+            }}
             className="block w-full focus:outline-none"
           >
             {singleMediaType === "video" ? (
-              <video src={media_url} className="w-full h-[140px] object-cover" muted playsInline />
+              <video
+                src={media_url}
+                className="w-full h-[140px] object-cover"
+                muted
+                playsInline
+              />
             ) : (
               <img
                 src={media_url}
@@ -362,7 +416,9 @@ export default function DropPopup({
           onClick={() => handleVote(1)}
           className={[
             "px-2 py-1 rounded-lg border text-sm",
-            myVote === 1 ? "bg-black text-white border-black" : "bg-white border-neutral-300 hover:bg-black/5",
+            myVote === 1
+              ? "bg-black text-white border-black"
+              : "bg-white border-neutral-300 hover:bg-black/5",
             !canVote ? "opacity-50 cursor-not-allowed" : "",
           ].join(" ")}
           title={canVote ? "Like" : "Sign in to vote"}
@@ -375,7 +431,9 @@ export default function DropPopup({
           onClick={() => handleVote(-1)}
           className={[
             "px-2 py-1 rounded-lg border text-sm",
-            myVote === -1 ? "bg-black text-white border-black" : "bg-white border-neutral-300 hover:bg-black/5",
+            myVote === -1
+              ? "bg-black text-white border-black"
+              : "bg-white border-neutral-300 hover:bg-black/5",
             !canVote ? "opacity-50 cursor-not-allowed" : "",
           ].join(" ")}
           title={canVote ? "Dislike" : "Sign in to vote"}
@@ -388,6 +446,12 @@ export default function DropPopup({
           </span>
         )}
       </div>
+
+      {/* Rating */}
+      <RatingStars pinId={id} userId={uid} />
+
+      {/* Comments */}
+      <CommentsSection pinId={id} userId={uid} />
 
       {/* Lightbox */}
       {lightboxOpen && (
