@@ -27,6 +27,15 @@ const MyPins  = lazy(() => import("@/rides/pages/MyPins.jsx"));
 // ✅ Settings → Drops (replace deleted SettingsPage)
 const MyDrops = lazy(() => import("@/rides/pages/settings/MyDrops.jsx"));
 
+// ✅ Profile
+const ProfilePage = lazy(() => import("@/profile/pages/Profile.jsx"));
+const EditProfile = lazy(() => import("@/profile/pages/EditProfile.jsx"));
+
+// ✅ Wdrop (Trips)
+const WdropTripList   = lazy(() => import("@/wdrop/components/TripList.jsx"));
+const WdropTripDetail = lazy(() => import("@/wdrop/components/TripDetail.jsx"));
+const WdropNewTrip    = lazy(() => import("@/wdrop/components/NewTrip.jsx"));
+
 function Loading() {
   return <div className="w-full py-10 text-center text-gray-500">Loading…</div>;
 }
@@ -47,6 +56,15 @@ export default function App() {
             {/* ✅ Pins */}
             <Route path="/pins/new" element={<AddPin />} />
             <Route path="/pins/mine" element={<MyPins />} />
+
+            {/* Profile */}
+            <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+
+            {/* Wdrop (Trips) */}
+            <Route path="/trips" element={<WdropTripList />} />
+            <Route path="/trips/new" element={<WdropNewTrip />} />
+            <Route path="/trips/:id" element={<WdropTripDetail />} />
 
             {/* Settings */}
             <Route path="/settings" element={<SettingsHome />} />
