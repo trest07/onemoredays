@@ -159,6 +159,7 @@ export default function MyDrops() {
   const [editing, setEditing] = useState(null); // holds the drop object
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState("");
+  let userId = "";
 
   useEffect(() => {
     (async () => {
@@ -167,7 +168,7 @@ export default function MyDrops() {
         setErr("");
         const { data: u, error } = await supabase.auth.getUser();
         if (error) throw error;
-        const userId = u?.user?.id;
+        userId = u?.user?.id;
         if (!userId) {
           setRows([]);
           return;

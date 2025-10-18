@@ -3,6 +3,8 @@ import { supabase } from "@/supabaseClient";
 import { AnimatePresence, motion } from "framer-motion";
 import { fetchMyDropsWithStats } from "@/rides/lib/drops";
 import { Item } from "../rides/pages/settings/MyDrops";
+import { fetchStopsForTrip, fetchTrips } from "../trips/lib/trips";
+import TripsPanel from "../trips/components/TripsPanel";
 
 /** Small helper: initials from a name */
 function initials(name = "") {
@@ -32,6 +34,8 @@ export default function ProfileCard({
   const [loading, setLoading] = useState(false);
   const [drops, setDrops] = useState([]);
   const [showDrops, setShowDrops] = useState(false);
+  const [trips, setTrips] = useState([]);
+  const [showTrips, setShowTrips] = useState(false);
 
   const loadPhotos = async () => {
     if (!profileId) return;
@@ -100,6 +104,7 @@ export default function ProfileCard({
   useEffect(() => {
     if (!profileId) return;
     loadPhotos();
+    loadTrips();
   }, [profileId, followStatus, userId]);
 
   // Load photos only if user is following and clicks camera
@@ -164,6 +169,14 @@ export default function ProfileCard({
       setLoading(false);
     }
   };
+
+  const loadTrips = async () => {
+    if (!profileId) return;
+    const data = await fetchTrips({ userId: profileId, currentUserId: userId });
+    setTrips(data ?? []);
+  };
+
+  const toggleTrips = () => setShowTrips((prev) => !prev);
 
   return (
     <div
@@ -242,6 +255,21 @@ export default function ProfileCard({
                 />
               </svg>
               <span>{drops.length}</span>
+            </span>
+
+            <span
+              className="inline-flex items-center gap-1.5 cursor-pointer shadow rounded-full px-2 py-0.5 hover:bg-gray-100"
+              onClick={toggleTrips}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M6 6V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1h3v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6h3Zm2-1v1h8V5H8Zm10 3H6v11h12V8Zm-6 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" />
+              </svg>
+              <span>{trips.length}</span>
             </span>
 
             <span className="inline-flex items-center gap-1.5 cursor-pointer shadow rounded-full px-2 py-0.5 hover:bg-gray-100">
@@ -360,6 +388,7 @@ export default function ProfileCard({
           </>
         )}
       </AnimatePresence>
+      <TripsPanel profileId={profileId} showTrips={showTrips} />
     </div>
   );
 }

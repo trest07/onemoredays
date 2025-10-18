@@ -27,6 +27,10 @@ const MyPins  = lazy(() => import("@/rides/pages/MyPins.jsx"));
 // ✅ Settings → Drops (replace deleted SettingsPage)
 const MyDrops = lazy(() => import("@/rides/pages/settings/MyDrops.jsx"));
 
+const TripList = lazy(() => import("@/trips/components/TripList.jsx"));
+const NewTrip = lazy(() => import("@/trips/components/NewTrip.jsx"));
+const TripDetail = lazy(() => import("@/trips/components/TripDetail.jsx"));
+
 function Loading() {
   return <div className="w-full py-10 text-center text-gray-500">Loading…</div>;
 }
@@ -61,6 +65,11 @@ export default function App() {
             {/* Activity */}
             <Route path="/activity" element={<ActivityHome />} />
             <Route path="/activity/drops" element={<MyDrops />} /> {/* 👈 uses existing MyDrops */}
+
+            {/* Trips */}
+            <Route path="/trips" element={<TripList />} />
+            <Route path="/trips/new" element={<NewTrip />} />
+            <Route path="/trips/:id" element={<TripDetail />} />
 
             {/* Default & fallback */}
             <Route path="/" element={<Navigate to="/rides/map" replace />} />
