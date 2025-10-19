@@ -40,9 +40,9 @@ const ProfilePage = lazy(() => import("@/profile/pages/Profile.jsx"));
 const EditProfile = lazy(() => import("@/profile/pages/EditProfile.jsx"));
 
 // ✅ Wdrop (Trips)
-const WdropTripList   = lazy(() => import("@/wdrop/components/TripList.jsx"));
-const WdropTripDetail = lazy(() => import("@/wdrop/components/TripDetail.jsx"));
-const WdropNewTrip    = lazy(() => import("@/wdrop/components/NewTrip.jsx"));
+// const WdropTripList   = lazy(() => import("@/wdrop/components/TripList.jsx"));
+// const WdropTripDetail = lazy(() => import("@/wdrop/components/TripDetail.jsx"));
+// const WdropNewTrip    = lazy(() => import("@/wdrop/components/NewTrip.jsx"));
 
 export default function App() {
   return (
@@ -66,9 +66,9 @@ export default function App() {
             <Route path="/profile/edit" element={<EditProfile />} />
 
             {/* Wdrop (Trips) */}
-            <Route path="/trips" element={<WdropTripList />} />
+            {/* <Route path="/trips" element={<WdropTripList />} />
             <Route path="/trips/new" element={<WdropNewTrip />} />
-            <Route path="/trips/:id" element={<WdropTripDetail />} />
+            <Route path="/trips/:id" element={<WdropTripDetail />} /> */}
 
             {/* Settings */}
             <Route path="/settings" element={<SettingsHome />} />
