@@ -28,3 +28,14 @@ dist-ssr
 yarn.lock
 .yarnrc.yml
 .pnp.*
+
+.env
+# env files
+.env
+.env.local
+
+
+# env files
+.env
+.env.local
+

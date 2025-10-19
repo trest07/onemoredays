@@ -1,5 +1,5 @@
-// BottomNav.jsx — Map + Settings only
-import React from "react";
+// BottomNav.jsx — Map, Activity, Settings
+import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { NavLink } from "react-router-dom";
 
@@ -12,6 +12,7 @@ const Icon = ({ d }) => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
     <path d={d} />
   </svg>
@@ -27,7 +28,6 @@ const Tab = ({ to, label, icon, isRoot }) => (
         isActive ? "text-primary bg-primary/10" : "text-gray-600 hover:text-primary",
       ].join(" ")
     }
-    // keep taps from leaking to Leaflet
     onTouchStartCapture={(e) => e.stopPropagation()}
     onPointerDownCapture={(e) => e.stopPropagation()}
     onMouseDownCapture={(e) => e.stopPropagation()}
@@ -39,18 +39,17 @@ const Tab = ({ to, label, icon, isRoot }) => (
 
 function InnerNav() {
   // Icons
-  const icons = {
+  const icons = useMemo(() => ({
     map: "M9 3l-6 2v16l6-2 6 2 6-2V3l-6 2-6-2zM9 5v14M15 7v14",
     toggle: "M4 12h16M7 8a4 4 0 1 1 0 8",
-    activity: "M3 12h3l2 7l4-14l4 14l2-7h3"
-  };
+    activity: "M3 12h3l2 7l4-14l4 14l2-7h3",
+  }), []);
 
-  // Only 2 tabs now
-  const tabs = [
-    { to: "/rides/map", label: "Map", icon: icons.map, isRoot: true },
-    { to: "/activity", label: "Activity", icon: icons.activity },
-    { to: "/settings", label: "Settings", icon: icons.toggle },    
-  ];
+  const tabs = useMemo(() => ([
+    { to: "/rides/map", label: "Map",      icon: icons.map,     isRoot: true },
+    { to: "/activity",  label: "Activity", icon: icons.activity },
+    { to: "/settings",  label: "Settings", icon: icons.toggle  },
+  ]), [icons]);
 
   return (
     <nav
@@ -70,7 +69,11 @@ function InnerNav() {
       onMouseDownCapture={(e) => e.stopPropagation()}
     >
       <div className="mx-auto w-full max-w-5xl">
-        <div className="mx-4 rounded-2xl border border-gray-200 bg-white shadow-lg px-2 py-2 grid grid-cols-3 gap-1">
+        <div
+          className="mx-4 rounded-2xl border border-gray-200 bg-white shadow-lg px-2 py-2 grid gap-1"
+          // auto-size columns to # of tabs without relying on Tailwind grid-cols-*
+          style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+        >
           {tabs.map((t) => (
             <Tab key={t.to} to={t.to} label={t.label} icon={t.icon} isRoot={t.isRoot} />
           ))}

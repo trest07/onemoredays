@@ -160,7 +160,9 @@ export default function MyDrops() {
   const [editing, setEditing] = useState(null); // holds the drop object
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState("");
-  let userId = "";
+
+  // ✅ keep userId at component scope so JSX can use it
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -169,12 +171,15 @@ export default function MyDrops() {
         setErr("");
         const { data: u, error } = await supabase.auth.getUser();
         if (error) throw error;
-        userId = u?.user?.id;
-        if (!userId) {
+
+        const uid = u?.user?.id ?? null; // avoid shadowing state name
+        setUserId(uid);
+
+        if (!uid) {
           setRows([]);
           return;
         }
-        const data = await fetchMyDropsWithStats({ userId });
+        const data = await fetchMyDropsWithStats({ userId: uid });
         setRows(data ?? []);
       } catch (e) {
         setErr(e?.message || "Failed to load your drops");
