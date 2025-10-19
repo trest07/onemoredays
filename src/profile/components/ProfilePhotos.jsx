@@ -6,6 +6,7 @@ import {
   uploadToCloudflare,
   compressImageFile,
 } from "@/lib/uploadToCloudflare";
+import Loading from "../../components/Loading";
 
 export default function ProfilePhotos() {
   const [photos, setPhotos] = useState([]);
@@ -171,7 +172,7 @@ export default function ProfilePhotos() {
 
         {/* Gallery */}
         {loading ? (
-          <div className="text-center text-gray-500 mt-10">Loading photos…</div>
+          <Loading />
         ) : photos.length === 0 ? (
           <div className="text-center text-gray-400 mt-10">No photos yet.</div>
         ) : (

@@ -3,6 +3,7 @@ import { fetchTripById, fetchStopsForTrip, addStop } from "@/trips/lib/trips";
 import { useParams, useNavigate } from "react-router-dom";
 import ItineraryDay from "./ItineraryDay";
 import { supabase } from "@/supabaseClient";
+import Loading from "../../components/Loading";
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -52,7 +53,7 @@ export default function TripDetail() {
     await handleAddStop(nextDay);
   }
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <Loading/>;
   if (!trip) return <div>Trip not found or access denied.</div>;
 
   // group stops by dayIndex

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
+import Loading from "../../components/Loading";
 
 export default function CommentsSection({ pinId, userId }) {
   const [comments, setComments] = useState([]);
@@ -113,7 +114,7 @@ export default function CommentsSection({ pinId, userId }) {
       {expanded && (
         <div className="mt-1 space-y-2 transition-all">
           {loading ? (
-            <p className="text-sm text-neutral-500">Load comments...</p>
+            <Loading />
           ) : comments.length === 0 ? (
             <p className="text-sm text-neutral-500">
               There are no comments yet.

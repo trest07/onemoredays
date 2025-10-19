@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/supabaseClient";
 import { fetchMyDropsWithStats } from "@/rides/lib/drops";
+import Loading from "../../../components/Loading";
 
 function PinCard({ pin }) {
   const thumb =
@@ -94,7 +95,7 @@ export default function MyDropsPanel() {
 
   if (loading) {
     return (
-      <div className="p-4 text-sm text-neutral-600">Loading your drops…</div>
+      <Loading />
     );
   }
 

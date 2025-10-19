@@ -7,6 +7,7 @@ import {
   TabsContent,
 } from "../../components/tabs";
 import InlineProfileCard from "../../rides/components/InlineProfileCard";
+import Loading from "../../components/Loading";
 
 // Simple card for a user
 function UserCard({
@@ -302,12 +303,7 @@ export default function ConnectionsTab() {
     if (!error) loadConnections(userId);
   }
 
-  if (loading)
-    return (
-      <div className="p-4 text-sm text-neutral-500 text-center">
-        Loading connections...
-      </div>
-    );
+  if (loading) return <Loading />;
 
   return (
     <div className="w-full max-w-md mx-auto mt-4">

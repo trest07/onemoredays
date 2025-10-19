@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import TopNav from "@/components/TopNav.jsx";
 import AuthAwareBottomBar from "@/components/AuthAwareBottomBar.jsx";
 import IosInstallPrompt from "@/components/IosInstallPrompt.jsx"; // 👈 iOS PWA banner
+import Loading from "./components/Loading";
 
 // Map
 const MapView = lazy(() => import("@/rides/pages/map/MapView.jsx"));
@@ -31,9 +32,9 @@ const TripList = lazy(() => import("@/trips/components/TripList.jsx"));
 const NewTrip = lazy(() => import("@/trips/components/NewTrip.jsx"));
 const TripDetail = lazy(() => import("@/trips/components/TripDetail.jsx"));
 
-function Loading() {
-  return <div className="w-full py-10 text-center text-gray-500">Loading…</div>;
-}
+// function Loading() {
+//   return <Loading className="w-full py-10 text-center text-gray-500"/>;
+// }
 
 export default function App() {
   return (
