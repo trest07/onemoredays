@@ -8,6 +8,7 @@ import {
 } from "../../components/tabs";
 import InlineProfileCard from "../../rides/components/InlineProfileCard";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
 
 // Simple card for a user
 function UserCard({
@@ -25,10 +26,11 @@ function UserCard({
   // const [userId, setUserId] = useState("");
   const [loggedUserId, setLoggedUserId] = useState(null);
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     const loadFollowStatus = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const userIdNew = userData?.user?.id;
+      // const { data: userData } = await supabase.auth.getUser();
+      const userIdNew = loggedUser?.id;
       setLoggedUserId(userIdNew);
 
       const { data } = await supabase
@@ -185,16 +187,17 @@ export default function ConnectionsTab({ profileId, isOwner = true }) {
   const [err, setErr] = useState("");
   const [userId, setUserId] = useState(profileId || "");
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     (async () => {
       try {
         let user;
         if (!userId) {
-          const { data: userData, error: userErr } =
-            await supabase.auth.getUser();
+          // const { data: userData, error: userErr } =
+          //   await supabase.auth.getUser();
 
-          if (userErr) throw userErr;
-          user = userData?.user;
+          // if (userErr) throw userErr;
+          user = loggedUser;
         } else {
           user = { id: userId };
         }

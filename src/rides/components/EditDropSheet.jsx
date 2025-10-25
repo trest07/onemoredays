@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { compressImageFile, uploadToCloudflare } from "@/lib/uploadToCloudflare.js";
+import { useAuth } from "../../context/AuthContext";
 
 /** same key pattern as MapView composer */
 function omdMediaKey({ userId = "anon", originalName = "upload.jpg" } = {}) {
@@ -46,10 +47,11 @@ export default function EditDropSheet({ open, onClose, drop, onSave }) {
 
   if (!open || !drop) return null;
 
+  const { loggedUser } = useAuth();
   async function handleUploadSelected() {
     if (!files?.length) return;
-    const { data: u } = await supabase.auth.getUser();
-    const uid = u?.user?.id || "anon";
+    // const { data: u } = await supabase.auth.getUser();
+    const uid = loggedUser?.id || "anon";
 
     const out = [...mediaUrls];
     for (let i = 0; i < Math.min(files.length, 3 - out.length); i++) {

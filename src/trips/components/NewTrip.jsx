@@ -3,6 +3,7 @@ import { addTrip, updateTrip } from "@/trips/lib/trips";
 import { supabase } from "@/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
 import { uploadToCloudflare, compressImageFile } from "@/lib/uploadToCloudflare";
+import { useAuth } from "../../context/AuthContext";
 
 export default function NewTrip() {
   const navigate = useNavigate();
@@ -35,13 +36,14 @@ export default function NewTrip() {
     setPreview(URL.createObjectURL(f));
   }
 
+  const { loggedUser } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user?.user?.id) throw new Error("Not authenticated");
+      // const { data: user } = await supabase.auth.getUser();
+      if (!loggedUser?.id) throw new Error("Not authenticated");
 
       let imageUrl = preview;
       if (file) {

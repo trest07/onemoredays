@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"   // 👈 add
 import { supabase } from "@/supabaseClient"
 import Loading from "../../components/Loading"
+import { useAuth } from "../../context/AuthContext"
 
 export default function AccountSettings() {
   const [user, setUser] = useState(null)
@@ -23,15 +24,17 @@ export default function AccountSettings() {
 
   const navigate = useNavigate()               // 👈 add
 
+  const { loggedUser } = useAuth();
+
   useEffect(() => {
     let on = true
     ;(async () => {
       try {
-        const { data, error } = await supabase.auth.getUser()
-        if (error) throw error
+        // const { data, error } = await supabase.auth.getUser()
+        const data = loggedUser
         if (!on) return
-        setUser(data?.user ?? null)
-        setNewEmail(data?.user?.email ?? "")
+        setUser(data ?? null)
+        setNewEmail(data.email ?? "")
       } catch (e) {
         setErr(e?.message || "Auth error")
       } finally {

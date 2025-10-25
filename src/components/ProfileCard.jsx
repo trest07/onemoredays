@@ -6,6 +6,7 @@ import { DropItem } from "../rides/pages/settings/MyDrops";
 import { fetchStopsForTrip, fetchTrips } from "../trips/lib/trips";
 import TripsPanel from "../trips/components/TripsPanel";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 /** Small helper: initials from a name */
 function initials(name = "") {
@@ -66,10 +67,12 @@ export default function ProfileCard({
     loadDrops();
   };
 
+  const { loggedUser } = useAuth();
+
   useEffect(() => {
     const loadFollowStatus = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const userIdNew = userData?.user?.id;
+      // const { data: userData } = await supabase.auth.getUser();
+      const userIdNew = loggedUser?.id;
       setUserId(userIdNew);
 
       const { data } = await supabase

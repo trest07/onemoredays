@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import ItineraryDay from "./ItineraryDay";
 import { supabase } from "@/supabaseClient";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -28,9 +29,10 @@ export default function TripDetail() {
     })();
   }, [id]);
 
+    const { loggedUser } = useAuth();
   async function handleAddStop(dayIndex = 0) {
-    const { data: user } = await supabase.auth.getUser();
-    if (!user?.user?.id) return alert("Login required");
+    // const { data: user } = await supabase.auth.getUser();
+    if (!loggedUser?.id) return alert("Login required");
     try {
       const newStop = await addStop({
         trip_id: id,

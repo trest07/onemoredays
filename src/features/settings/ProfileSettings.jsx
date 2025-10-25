@@ -6,6 +6,7 @@ import {
   uploadToCloudflare,
 } from "@/lib/uploadToCloudflare";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
 
 function profileImageKey(userId = "anon", originalName = "avatar.jpg") {
   const d = new Date();
@@ -35,14 +36,15 @@ export default function ProfileSettings() {
     [file]
   );
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     let on = true;
     (async () => {
       try {
-        const { data: userData, error: userErr } =
-          await supabase.auth.getUser();
-        if (userErr) throw userErr;
-        const user = userData?.user;
+        // const { data: userData, error: userErr } =
+        //   await supabase.auth.getUser();
+        // if (userErr) throw userErr;
+        const user = loggedUser;
         if (!on) return;
         setUid(user?.id ?? null);
         setEmail(user?.email ?? "");

@@ -9,6 +9,7 @@ import {
 import RatingStars from "../../components/RatingStars";
 import CommentsSection from "../../components/CommentsSection";
 import Loading from "../../../components/Loading";
+import { useAuth } from "../../../context/AuthContext";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
 export function DropItem({ d, onDelete, onEdit, userId }) {
@@ -164,15 +165,16 @@ export default function MyDrops() {
   // ✅ keep userId at component scope so JSX can use it
   const [userId, setUserId] = useState(null);
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setErr("");
-        const { data: u, error } = await supabase.auth.getUser();
-        if (error) throw error;
+        // const { data: u, error } = await supabase.auth.getUser();
+        // if (error) throw error;
 
-        const uid = u?.user?.id ?? null; // avoid shadowing state name
+        const uid = loggedUser?.id ?? null; // avoid shadowing state name
         setUserId(uid);
 
         if (!uid) {

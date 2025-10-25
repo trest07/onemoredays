@@ -13,6 +13,7 @@ import InlineProfileCard from "@/rides/components/InlineProfileCard.jsx";
 
 import RatingStars from "@/rides/components/RatingStars.jsx";
 import CommentsSection from "@/rides/components/CommentsSection.jsx";
+import { useAuth } from "../../../context/AuthContext";
 
 /* ------------------------------ utils ------------------------------ */
 
@@ -177,11 +178,12 @@ export default function DropPopup({
   const [profileOpen, setProfileOpen] = useState(false);
 
   // keep auth state in sync (fixes disabled buttons after login)
+    const { loggedUser } = useAuth();
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (alive) setUid(data?.user?.id ?? null);
+      // const { data } = await supabase.auth.getUser();
+      if (alive) setUid(loggedUser?.id ?? null);
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       setUid(session?.user?.id ?? null);
@@ -219,8 +221,8 @@ export default function DropPopup({
         setDown(votes.down);
 
         // fetch my current vote if logged in
-        const { data } = await supabase.auth.getUser();
-        const userId = data?.user?.id;
+        // const { data } = await supabase.auth.getUser();
+        const userId = loggedUser?.id;
         if (!on) return;
         if (userId) {
           const v = await getVote(id, userId);

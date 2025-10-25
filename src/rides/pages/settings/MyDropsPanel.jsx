@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/supabaseClient";
 import { fetchMyDropsWithStats } from "@/rides/lib/drops";
 import Loading from "../../../components/Loading";
+import { useAuth } from "../../../context/AuthContext";
 
 function PinCard({ pin }) {
   const thumb =
@@ -60,43 +61,62 @@ function Section({ title, items }) {
 export default function MyDropsPanel() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { loggedUser } = useAuth();
   useEffect(() => {
     let on = true;
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
-        const userId = u?.user?.id;
-        if (!userId) { setRows([]); return; }
+        // const { data: u } = await supabase.auth.getUser();
+        const userId = loggedUser?.id;
+        if (!userId) {
+          setRows([]);
+          return;
+        }
         const data = await fetchMyDropsWithStats({ userId });
         if (on) setRows(data ?? []);
       } finally {
         if (on) setLoading(false);
       }
     })();
-    return () => { on = false; };
+    return () => {
+      on = false;
+    };
   }, []);
 
-  const recent3 = useMemo(() =>
-    [...rows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,3)
-  , [rows]);
+  const recent3 = useMemo(
+    () =>
+      [...rows]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 3),
+    [rows]
+  );
 
-  const mostViewed = useMemo(() =>
-    [...rows].sort((a,b) => (b.view_count??0) - (a.view_count??0)).slice(0, 10)
-  , [rows]);
+  const mostViewed = useMemo(
+    () =>
+      [...rows]
+        .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0))
+        .slice(0, 10),
+    [rows]
+  );
 
-  const mostLiked = useMemo(() =>
-    [...rows].sort((a,b) => (b.up_count??0) - (a.up_count??0)).slice(0, 10)
-  , [rows]);
+  const mostLiked = useMemo(
+    () =>
+      [...rows]
+        .sort((a, b) => (b.up_count ?? 0) - (a.up_count ?? 0))
+        .slice(0, 10),
+    [rows]
+  );
 
-  const mostDisliked = useMemo(() =>
-    [...rows].sort((a,b) => (b.down_count??0) - (a.down_count??0)).slice(0, 10)
-  , [rows]);
+  const mostDisliked = useMemo(
+    () =>
+      [...rows]
+        .sort((a, b) => (b.down_count ?? 0) - (a.down_count ?? 0))
+        .slice(0, 10),
+    [rows]
+  );
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return (

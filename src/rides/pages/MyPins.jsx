@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/supabaseClient'
 import { fetchMyDrops, updateDrop, deleteDrop } from '@/rides/lib/drops'
 import Loading from '../../components/Loading'
+import { useAuth } from '../../context/AuthContext'
 
 export default function MyPins() {
   const [userId, setUserId] = useState(null)
@@ -14,13 +15,14 @@ export default function MyPins() {
   const [deletingId, setDeletingId] = useState(null)
 
   // Load current user
+  const { loggedUser } = useAuth();
   useEffect(() => {
     let mounted = true
     ;(async () => {
       try {
-        const { data } = await supabase.auth.getUser()
+        // const { data } = await supabase.auth.getUser()
         if (!mounted) return
-        setUserId(data?.user?.id ?? null)
+        setUserId(loggedUser?.id ?? null)
       } catch (e) {
         setErr(e?.message ?? 'Auth error')
       }

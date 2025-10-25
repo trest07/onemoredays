@@ -29,6 +29,7 @@ import { supabase } from "@/supabaseClient";
 import marker2x from "leaflet/dist/images/marker-icon-2x.png";
 import marker1x from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { useAuth } from "../../../context/AuthContext.jsx";
 L.Icon.Default.mergeOptions({ iconRetinaUrl: marker2x, iconUrl: marker1x, shadowUrl: markerShadow });
 
 const NAV_HEIGHT_PX = 64;
@@ -142,12 +143,13 @@ export default function MapView() {
 
   // auth
   const [authed, setAuthed] = useState(false);
+  const { loggedUser } = useAuth();
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { data } = await supabase.auth.getUser();
+      // const { data } = await supabase.auth.getUser();
       if (!mounted) return;
-      setAuthed(Boolean(data?.user));
+      setAuthed(Boolean(loggedUser));
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setAuthed(Boolean(s?.user));
@@ -221,8 +223,8 @@ export default function MapView() {
       // uploads (up to 3)
       let media_urls = [];
       if (files?.length) {
-        const { data: u } = await supabase.auth.getUser();
-        const uid = u?.user?.id || "anon";
+        // const { data: u } = await supabase.auth.getUser();
+        const uid = loggedUser?.id || "anon";
         for (let i = 0; i < Math.min(files.length, 3); i++) {
           const f = files[i];
           const compressed = await compressImageFile(f, 1280, 0.82);

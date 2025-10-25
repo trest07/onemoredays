@@ -7,6 +7,7 @@ import {
   compressImageFile,
 } from "@/lib/uploadToCloudflare";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProfilePhotos({ profile, isOwner = true }) {
   const [photos, setPhotos] = useState([]);
@@ -18,11 +19,12 @@ export default function ProfilePhotos({ profile, isOwner = true }) {
   const [user, setUser] = useState(profile);
 
   // auth
+  const { loggedUser } = useAuth();
   useEffect(() => {
     (async () => {
       if(user?.id) return;
-      const { data } = await supabase.auth.getUser();
-      if (data?.user) setUser(data.user);
+      // const { data } = await supabase.auth.getUser();
+      if (loggedUser) setUser(loggedUser);
     })();
   }, []);
 
