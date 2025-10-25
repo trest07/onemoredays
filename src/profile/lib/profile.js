@@ -64,11 +64,9 @@ export async function getProfileById(idOrUsername) {
   // 1) Try by UUID
   let { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, username, photo_url, bio, created_at")
+    .select("id, display_name, username, photo_url, bio, created_at, banner_url")
     .eq("id", key)
     .maybeSingle();
-
-  if (error) throw error;
 
   if (!data) {
     // 2) Fallback to username
@@ -81,6 +79,11 @@ export async function getProfileById(idOrUsername) {
     if (byUsername.error) throw byUsername.error;
     data = byUsername.data || null;
   }
+
+  if (!data){
+    if (error) throw error;
+  }
+  
 
   const counts = await fetchProfileStatsClient(data.id);
   data = { ...data, ...counts };
