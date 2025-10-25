@@ -387,3 +387,13 @@ export async function fetchTopPosters({ limit = 5 } = {}) {
   if (error) throw error
   return data ?? []
 }
+
+/* ------------------------------ Compat wrapper --------------------------- */
+/**
+ * Compatibility shim so existing components can import:
+ *   import { listDropsByProfile } from "../../rides/lib/drops.js";
+ */
+export async function listDropsByProfile(profileId, opts = {}) {
+  if (!profileId) throw new Error('Missing profileId')
+  return fetchMyDrops({ userId: profileId, ...opts })
+}

@@ -51,3 +51,68 @@ export async function toggleFollow(targetId, currentUserId) {
     return { following: true };
   }
 }
+// ----------------------------
+// 👇 ADD THIS AT THE BOTTOM 👇
+// ----------------------------
+
+// Resolve :id that could be a UUID or a username (with/without "@")
+export async function getProfileById(idOrUsername) {
+  const key = String(idOrUsername || "").trim().replace(/^@/, "");
+
+  // 1) Try by UUID
+  let { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, username, photo_url, bio, created_at")
+    .eq("id", key)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (data) return data;
+
+  // 2) Fallback to username
+  const byUsername = await supabase
+    .from("profiles")
+    .select("id, display_name, username, photo_url, bio, created_at")
+    .eq("username", key)
+    .maybeSingle();
+
+  if (byUsername.error) throw byUsername.error;
+  return byUsername.data || null;
+}
+
+// Current user's profile (creates a minimal row if missing)
+export async function getMyProfile() {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
+  if (!user) return null;
+
+  // Try existing row
+  let { data: rows, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, username, photo_url, bio, created_at")
+    .eq("id", user.id)
+    .limit(1);
+
+  if (error) throw error;
+  if (rows && rows.length) return rows[0];
+
+  // Create minimal profile if none exists
+  const username =
+    (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(/[^a-z0-9_]/gi, "");
+
+  const insert = await supabase
+    .from("profiles")
+    .insert({
+      id: user.id,
+      username,
+      display_name: "",
+      bio: "",
+      photo_url: "/avatar.jpg",
+      discoverable: false,
+    })
+    .select("id, display_name, username, photo_url, bio, created_at")
+    .single();
+
+  if (insert.error) throw insert.error;
+  return insert.data;
+}
