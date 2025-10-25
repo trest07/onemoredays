@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { AnimatePresence, motion } from "framer-motion";
 import { fetchMyDropsWithStats } from "@/rides/lib/drops";
-import { Item } from "../rides/pages/settings/MyDrops";
+import { DropItem } from "../rides/pages/settings/MyDrops";
 import { fetchStopsForTrip, fetchTrips } from "../trips/lib/trips";
 import TripsPanel from "../trips/components/TripsPanel";
+import { useNavigate } from "react-router-dom";
 
 /** Small helper: initials from a name */
 function initials(name = "") {
@@ -36,6 +37,7 @@ export default function ProfileCard({
   const [showDrops, setShowDrops] = useState(false);
   const [trips, setTrips] = useState([]);
   const [showTrips, setShowTrips] = useState(false);
+  const navigate = useNavigate();
 
   const loadPhotos = async () => {
     if (!profileId) return;
@@ -190,7 +192,11 @@ export default function ProfileCard({
     >
       <div className="flex items-center gap-4">
         {/* Avatar */}
-        <div className="relative shrink-0">
+        <div
+          className="relative shrink-0 cursor-pointer hover:opacity-90 transition"
+          onClick={() => navigate(`/profile/${profileId}`)}
+          title={`Go to ${name}'s profile`}
+        >
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -215,16 +221,22 @@ export default function ProfileCard({
 
         {/* Texts */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-base font-semibold text-gray-900 truncate">
-              {name}
-            </h3>
-          </div>
-          {username ? (
-            <div className="text-sm text-gray-500 truncate">
-              {username.startsWith("@") ? username : `@${username}`}
+          <div
+            className="cursor-pointer hover:opacity-90 transition"
+            onClick={() => navigate(`/profile/${profileId}`)}
+            title={`Go to ${name}'s profile`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-semibold text-gray-900 truncate">
+                {name}
+              </h3>
             </div>
-          ) : null}
+            {username ? (
+              <div className="text-sm text-gray-500 truncate">
+                {username.startsWith("@") ? username : `@${username}`}
+              </div>
+            ) : null}
+          </div>
           {subtitle ? (
             <div className="mt-0.5 text-xs text-gray-500 truncate">
               {subtitle}
@@ -382,7 +394,7 @@ export default function ProfileCard({
               exit={{ opacity: 0, y: -8 }}
             >
               {drops.map((d) => (
-                <Item key={d.id} d={d} userId={userId} />
+                <DropItem key={d.id} d={d} userId={userId} />
               ))}
             </motion.div>
           </>

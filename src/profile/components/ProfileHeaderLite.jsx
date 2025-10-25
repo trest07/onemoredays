@@ -11,14 +11,14 @@ export default function ProfileHeaderLite({ profile, isOwner }) {
         <UserLink
           userId={profile.id}
           username={profile.username}
-          avatarUrl={profile.avatar_url || "/avatar.png"}
+          avatarUrl={profile.photoUrl || "/avatar.jpg"}
           avatarSize={64}
           className="flex items-center gap-3"
         >
           {/* Keep your exact visuals as children */}
           {/* Avatar */}
           <img
-            src={profile.avatar_url || "/avatar.png"}
+            src={profile.photoUrl || "/avatar.jpg"}
             alt="avatar"
             className="w-16 h-16 rounded-full object-cover"
           />

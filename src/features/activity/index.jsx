@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import MyDrops from "@/rides/pages/settings/MyDrops.jsx";
 import TopPostersWidget from "@/rides/pages/settings/TopPostersWidget.jsx";
 import ConnectionsTab from "../../profile/components/ConnectionsTab";
-import ProfilePhotos from "../../profile/components/ProfilePhotos";
 import TripList from "../../trips/components/TripList";
+import ProfilePhotos from "../../profile/components/ProfilePhotos";
 
 export default function Activity() {
   const [tab, setTab] = useState("drops");
@@ -25,7 +25,9 @@ export default function Activity() {
           <button
             key={t.key}
             disabled={t.disabled}
-            onClick={() => { if (!t.disabled) setTab(t.key); }}
+            onClick={() => {
+              if (!t.disabled) setTab(t.key);
+            }}
             type="button"
             className={[
               "px-3 rounded-full border transition min-h-[36px] shadow-md",
@@ -33,7 +35,7 @@ export default function Activity() {
                 ? "opacity-40 cursor-not-allowed"
                 : tab === t.key
                 ? "bg-black text-white border-black"
-                : "border-neutral-300 hover:bg-black/5"
+                : "border-neutral-300 hover:bg-black/5",
             ].join(" ")}
           >
             {t.label}
@@ -49,9 +51,9 @@ export default function Activity() {
         </>
       )}
 
-      {tab === "connections" && <ConnectionsTab/>}
-      {tab === "photos" && <ProfilePhotos/>}
-      {tab === "trips" && <TripList/>}
+      {tab === "connections" && <ConnectionsTab />}
+      {tab === "photos" && <ProfilePhotos />}
+      {tab === "trips" && <TripList />}
     </div>
   );
 }

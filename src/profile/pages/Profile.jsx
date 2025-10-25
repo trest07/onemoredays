@@ -5,7 +5,10 @@ import ProfileHeaderLite from "../components/ProfileHeaderLite.jsx";
 import ProfileTabs from "../components/ProfileTabs.jsx";
 import ProfileAbout from "../components/ProfileAbout.jsx";
 import ProfileDrops from "../components/ProfileDrops.jsx";
-import ProfileTrips from "../components/ProfileTrips.jsx";
+import TripsPanel from "../../trips/components/TripsPanel.jsx";
+import ProfilePhotos from "../components/ProfilePhotos.jsx";
+import Loading from "../../components/Loading.jsx";
+import ConnectionsTab from "../components/ConnectionsTab.jsx";
 
 /**
  * Profile.jsx
@@ -44,7 +47,7 @@ export default function Profile() {
     };
   }, [id]);
 
-  if (loading) return <div className="p-4">Loading profile…</div>;
+  if (loading) return <Loading text="Loading profile…" />;
   if (error) return <div className="p-4 text-red-600">{error}</div>;
   if (!profile) return <div className="p-4">Profile not found.</div>;
 
@@ -66,17 +69,15 @@ export default function Profile() {
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="trips">
-          <ProfileTrips profileId={profile.id} isOwner={isOwner} />
+          <TripsPanel profileId={profile.id} />
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="photos">
-          <div className="p-4 text-gray-500">Photos tab (coming soon).</div>
+          <ProfilePhotos isOwner={isOwner} profile={profile}/>
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="connections">
-          <div className="p-4 text-gray-500">
-            Connections tab (coming soon).
-          </div>
+          <ConnectionsTab profileId={profile.id} isOwner={isOwner}/>
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="about">

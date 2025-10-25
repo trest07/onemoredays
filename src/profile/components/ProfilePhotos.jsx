@@ -8,18 +8,19 @@ import {
 } from "@/lib/uploadToCloudflare";
 import Loading from "../../components/Loading";
 
-export default function ProfilePhotos() {
+export default function ProfilePhotos({ profile, isOwner = true }) {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(profile);
 
   // auth
   useEffect(() => {
     (async () => {
+      if(user?.id) return;
       const { data } = await supabase.auth.getUser();
       if (data?.user) setUser(data.user);
     })();
@@ -91,14 +92,15 @@ export default function ProfilePhotos() {
     <div className="min-h-screen bg-gray-50 text-gray-800 p-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold">My Photos</h2>
-          {/* <label className="cursor-pointer bg-black text-white px-3 py-1 rounded-xl hover:bg-gray-800 transition">
+        {isOwner && (
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xl font-semibold">My Photos</h2>
+            {/* <label className="cursor-pointer bg-black text-white px-3 py-1 rounded-xl hover:bg-gray-800 transition">
             Upload
             <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
           </label> */}
-          <label className="flex items-center gap-2 cursor-pointer bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition shadow-sm active:scale-95">
-            {/* <svg
+            <label className="flex items-center gap-2 cursor-pointer bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition shadow-sm active:scale-95">
+              {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="none"
@@ -110,15 +112,16 @@ export default function ProfilePhotos() {
             >
               <path d="M12 5v14M5 12h14" />
             </svg> */}
-            <span className="text-sm font-medium">Upload</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFile}
-            />
-          </label>
-        </div>
+              <span className="text-sm font-medium">Upload</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFile}
+              />
+            </label>
+          </div>
+        )}
 
         {/* Upload modal */}
         <AnimatePresence>
@@ -193,24 +196,26 @@ export default function ProfilePhotos() {
                     {p.caption}
                   </div>
                 )}
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 rounded-full p-1 shadow transition opacity-0 group-hover:opacity-100"
-                  title="Delete"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="w-4 h-4"
+                {isOwner && (
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 rounded-full p-1 shadow transition opacity-0 group-hover:opacity-100"
+                    title="Delete"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M6 2a1 1 0 00-1 1v1H3.5a.5.5 0 000 1H4v11a2 2 0 002 2h8a2 2 0 002-2V5h.5a.5.5 0 000-1H15V3a1 1 0 00-1-1H6zm2 4a.5.5 0 011 0v8a.5.5 0 01-1 0V6zm4 0a.5.5 0 011 0v8a.5.5 0 01-1 0V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M6 2a1 1 0 00-1 1v1H3.5a.5.5 0 000 1H4v11a2 2 0 002 2h8a2 2 0 002-2V5h.5a.5.5 0 000-1H15V3a1 1 0 00-1-1H6zm2 4a.5.5 0 011 0v8a.5.5 0 01-1 0V6zm4 0a.5.5 0 011 0v8a.5.5 0 01-1 0V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                )}
               </motion.div>
             ))}
           </div>

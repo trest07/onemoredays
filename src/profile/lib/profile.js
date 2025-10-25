@@ -57,7 +57,9 @@ export async function toggleFollow(targetId, currentUserId) {
 
 // Resolve :id that could be a UUID or a username (with/without "@")
 export async function getProfileById(idOrUsername) {
-  const key = String(idOrUsername || "").trim().replace(/^@/, "");
+  const key = String(idOrUsername || "")
+    .trim()
+    .replace(/^@/, "");
 
   // 1) Try by UUID
   let { data, error } = await supabase
@@ -67,17 +69,62 @@ export async function getProfileById(idOrUsername) {
     .maybeSingle();
 
   if (error) throw error;
-  if (data) return data;
 
-  // 2) Fallback to username
-  const byUsername = await supabase
-    .from("profiles")
-    .select("id, display_name, username, photo_url, bio, created_at")
-    .eq("username", key)
-    .maybeSingle();
+  if (!data) {
+    // 2) Fallback to username
+    const byUsername = await supabase
+      .from("profiles")
+      .select("id, display_name, username, photo_url, bio, created_at")
+      .eq("username", key)
+      .maybeSingle();
 
-  if (byUsername.error) throw byUsername.error;
-  return byUsername.data || null;
+    if (byUsername.error) throw byUsername.error;
+    data = byUsername.data || null;
+  }
+
+  const counts = await fetchProfileStatsClient(data.id);
+  data = { ...data, ...counts };
+
+  return data;
+}
+
+export async function fetchProfileStatsClient(userId) {
+  const [
+    { count: followers },
+    { count: following },
+    { count: drops },
+    { count: trips },
+  ] = await Promise.all([
+    supabase
+      .schema("omd")
+      .from("follow_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("followed_id", userId)
+      .eq("status", "accepted"),
+    supabase
+      .schema("omd")
+      .from("follow_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", userId)
+      .eq("status", "accepted"),
+    supabase
+      .schema("omd")
+      .from("my_pins_list")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .schema("omd")
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+  ]);
+
+  return {
+    followers_count: followers ?? 0,
+    following_count: following ?? 0,
+    drops_count: drops ?? 0,
+    trips_count: trips ?? 0,
+  };
 }
 
 // Current user's profile (creates a minimal row if missing)
@@ -97,8 +144,10 @@ export async function getMyProfile() {
   if (rows && rows.length) return rows[0];
 
   // Create minimal profile if none exists
-  const username =
-    (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(/[^a-z0-9_]/gi, "");
+  const username = (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(
+    /[^a-z0-9_]/gi,
+    ""
+  );
 
   const insert = await supabase
     .from("profiles")

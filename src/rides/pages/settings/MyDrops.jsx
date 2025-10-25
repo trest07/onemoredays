@@ -11,7 +11,7 @@ import CommentsSection from "../../components/CommentsSection";
 import Loading from "../../../components/Loading";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
-export function Item({ d, onDelete, onEdit, userId }) {
+export function DropItem({ d, onDelete, onEdit, userId }) {
   const thumb =
     (Array.isArray(d.media_urls) && d.media_urls[0]) ||
     d.image_url ||
@@ -232,7 +232,7 @@ export default function MyDrops() {
     <div className={deletingId ? "opacity-50" : ""}>
       <div className="max-w-2xl mx-auto space-y-3">
         {rows.map((d) => (
-          <Item
+          <DropItem
             key={d.id}
             d={d}
             onEdit={(row) => setEditing(row)}
