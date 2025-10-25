@@ -1,6 +1,7 @@
 // src/rides/pages/map/MapControls.jsx
 import React, { useEffect, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
+import Loading from '../../../components/Loading'
 
 export default function MapControls({ coords, topOffsetPx = 12 }) {
   const map = useMap()
@@ -97,7 +98,7 @@ export default function MapControls({ coords, topOffsetPx = 12 }) {
               className="flex-1 border rounded-lg px-3 py-2"
             />
             <button type="submit" className="px-3 py-2 rounded-lg border bg-gray-50 hover:bg-gray-100">
-              {loading ? 'Searching…' : 'Search'}
+              {loading ? <Loading text={'Searching…' }/>: 'Search'}
             </button>
           </form>
 

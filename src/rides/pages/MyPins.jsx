@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/supabaseClient'
 import { fetchMyDrops, updateDrop, deleteDrop } from '@/rides/lib/drops'
+import Loading from '../../components/Loading'
 
 export default function MyPins() {
   const [userId, setUserId] = useState(null)
@@ -117,7 +118,7 @@ export default function MyPins() {
       ) : null}
 
       {loading ? (
-        <div className="text-sm opacity-70">Loading…</div>
+        <Loading />
       ) : isEmpty ? (
         <div className="text-sm opacity-70">You haven’t created any pins yet.</div>
       ) : (

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"   // 👈 add
 import { supabase } from "@/supabaseClient"
+import Loading from "../../components/Loading"
 
 export default function AccountSettings() {
   const [user, setUser] = useState(null)
@@ -106,7 +107,7 @@ export default function AccountSettings() {
     }
   }
 
-  if (loadingUser) return <div className="text-sm opacity-70 px-4">Loading…</div>
+  if (loadingUser) return <Loading />
 
   return (
     <div className="max-w-screen-sm mx-auto px-4 pb-28" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 110px)' }}>

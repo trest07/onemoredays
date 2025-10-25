@@ -6,6 +6,7 @@ import MyDrops from "@/rides/pages/settings/MyDrops.jsx";
 import TopPostersWidget from "@/rides/pages/settings/TopPostersWidget.jsx";
 import ConnectionsTab from "../../profile/components/ConnectionsTab";
 import ProfilePhotos from "../../profile/components/ProfilePhotos";
+import TripList from "../../trips/components/TripList";
 
 export default function Activity() {
   const [tab, setTab] = useState("drops");
@@ -14,6 +15,7 @@ export default function Activity() {
     { key: "drops", label: "My Drops" },
     { key: "photos", label: "My Photos" },
     { key: "connections", label: "Connections" },
+    { key: "trips", label: "Trips" },
   ];
 
   return (
@@ -49,6 +51,7 @@ export default function Activity() {
 
       {tab === "connections" && <ConnectionsTab/>}
       {tab === "photos" && <ProfilePhotos/>}
+      {tab === "trips" && <TripList/>}
     </div>
   );
 }

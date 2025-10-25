@@ -8,6 +8,7 @@ import {
 } from "@/rides/lib/drops";
 import RatingStars from "../../components/RatingStars";
 import CommentsSection from "../../components/CommentsSection";
+import Loading from "../../../components/Loading";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
 export function Item({ d, onDelete, onEdit, userId }) {
@@ -218,8 +219,7 @@ export default function MyDrops() {
     }
   }
 
-  if (loading)
-    return <div className="p-4 text-sm text-neutral-600">Loading…</div>;
+  if (loading) return <Loading />;
   if (err) return <div className="p-4 text-sm text-red-600">{err}</div>;
   if (!rows.length)
     return (
