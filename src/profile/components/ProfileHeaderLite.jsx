@@ -1,28 +1,40 @@
+// src/profile/components/ProfileHeaderLite.jsx
 import { Link } from "react-router-dom";
 import Badge from "../../components/Badge.jsx";
+import UserLink from "@/profile/components/userlink.jsx";
 
 export default function ProfileHeaderLite({ profile, isOwner }) {
   return (
     <div className="p-4 border-b">
       <div className="flex items-center gap-3">
-        {/* Avatar */}
-        <img
-          src={profile.avatar_url || "/avatar.png"}
-          alt="avatar"
-          className="w-16 h-16 rounded-full object-cover"
-        />
+        {/* Avatar + name/username wrapped with a profile link */}
+        <UserLink
+          userId={profile.id}
+          username={profile.username}
+          avatarUrl={profile.avatar_url || "/avatar.png"}
+          avatarSize={64}
+          className="flex items-center gap-3"
+        >
+          {/* Keep your exact visuals as children */}
+          {/* Avatar */}
+          <img
+            src={profile.avatar_url || "/avatar.png"}
+            alt="avatar"
+            className="w-16 h-16 rounded-full object-cover"
+          />
 
-        {/* Name / username */}
-        <div className="flex-1">
-          <div className="text-lg font-semibold">
-            {profile.display_name || profile.username || "User"}
+          {/* Name / username */}
+          <div className="flex-1">
+            <div className="text-lg font-semibold">
+              {profile.display_name || profile.username || "User"}
+            </div>
+            <div className="text-xs text-gray-500">@{profile.username}</div>
+
+            {/* Example: show badge if driver or vendor */}
+            {profile.is_driver && <Badge text="Driver" />}
+            {profile.is_vendor && <Badge text="Vendor" />}
           </div>
-          <div className="text-xs text-gray-500">@{profile.username}</div>
-
-          {/* Example: show badge if driver or vendor */}
-          {profile.is_driver && <Badge text="Driver" />}
-          {profile.is_vendor && <Badge text="Vendor" />}
-        </div>
+        </UserLink>
 
         {/* Edit button if owner */}
         {isOwner && (
