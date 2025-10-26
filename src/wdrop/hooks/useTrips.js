@@ -15,7 +15,7 @@ export function useTripsByProfile(profileId) {
     let mounted = true;
 
     (async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const rows = await listTripsByProfile(profileId);
         if (mounted) setTrips(rows);
@@ -48,7 +48,7 @@ export function useTrip(tripId) {
     let mounted = true;
 
     (async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const data = await getTripById(tripId);
         if (mounted) setTrip(data);

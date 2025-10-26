@@ -8,6 +8,7 @@ import {
 } from "@/lib/uploadToCloudflare";
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 export default function ProfilePhotos({ profile, isOwner = true }) {
   const [photos, setPhotos] = useState([]);
@@ -17,12 +18,13 @@ export default function ProfilePhotos({ profile, isOwner = true }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [user, setUser] = useState(profile);
+  const { showAlert, showConfirm } = useAlert();
 
   // auth
   const { loggedUser } = useAuth();
   useEffect(() => {
     (async () => {
-      if(user?.id) return;
+      if (user?.id) return;
       // const { data } = await supabase.auth.getUser();
       if (loggedUser) setUser(loggedUser);
     })();
@@ -74,20 +76,29 @@ export default function ProfilePhotos({ profile, isOwner = true }) {
       setPreview("");
       await loadPhotos();
     } catch (err) {
-      alert("Error uploading: " + err.message);
+      // alert("Error uploading: " + err.message);
+      showAlert({
+        message: "Error uploading: " + err.message,
+        type: "warning",
+      });
     } finally {
       setUploading(false);
     }
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("Delete this photo?")) return;
-    const { error } = await supabase
-      .schema("omd")
-      .from("profile_photos")
-      .delete()
-      .eq("id", id);
-    if (!error) setPhotos((p) => p.filter((x) => x.id !== id));
+    // if (!window.confirm("Delete this photo?")) return;
+    showConfirm({
+      message: "Delete this photo?",
+      onConfirm: async () => {
+        const { error } = await supabase
+          .schema("omd")
+          .from("profile_photos")
+          .delete()
+          .eq("id", id);
+        if (!error) setPhotos((p) => p.filter((x) => x.id !== id));
+      },
+    });
   }
 
   return (

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
 import Loading from "../../components/Loading";
+import { useAlert } from "../../context/AlertContext";
 
 export default function CommentsSection({ pinId, userId }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [expanded, setExpanded] = useState(false);
   const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { showAlert } = useAlert();
 
   // load comment count
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function CommentsSection({ pinId, userId }) {
   }, [expanded, pinId]);
 
   async function loadComments() {
-    setLoading(true);
+    // setLoading(true);
 
     try {
       const { data: commentsData, error: commentsError } = await supabase
@@ -77,7 +79,8 @@ export default function CommentsSection({ pinId, userId }) {
   }
 
   async function postComment() {
-    if (!userId) return alert("Log in to comment");
+    if (!userId) //return alert("Log in to comment");
+    showAlert({ message: "Log in to comment", type: "warning" });
     if (!text.trim()) return;
 
     const { error } = await supabase.schema("omd").from("pin_comments").insert({

@@ -4,15 +4,21 @@ import UserLink from "@/profile/components/userlink.jsx";
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useAlert } from "../../context/AlertContext.jsx";
 
 export default function ProfileHeaderLite({ profile, isOwner }) {
   const [userId, setUserId] = useState("");
   const [profileId, setProfileId] = useState(profile.id);
   const [loading, setLoading] = useState(false);
   const [followStatus, setFollowStatus] = useState("none");
-  const [followersCount, setFollowersCount] = useState(profile.followers_count || 0);
-  const [followingCount, setFollowingCount] = useState(profile.following_count || 0);
+  const [followersCount, setFollowersCount] = useState(
+    profile.followers_count || 0
+  );
+  const [followingCount, setFollowingCount] = useState(
+    profile.following_count || 0
+  );
   const { loggedUser } = useAuth();
+  const { showAlert } = useAlert();
 
   const bannerUrl = profile.banner_url || "/default-banner.jpg";
   const avatarUrl = profile.photo_url || "/avatar.jpg";
@@ -39,7 +45,9 @@ export default function ProfileHeaderLite({ profile, isOwner }) {
   }, [profileId]);
 
   const handleFollowClick = async () => {
-    if (!userId) return alert("You must be logged in.");
+    if (!userId)
+      //return alert("You must be logged in.");
+      showAlert({ message: "You must be logged in.", type: "warning" });
 
     setLoading(true);
     try {
@@ -124,7 +132,7 @@ export default function ProfileHeaderLite({ profile, isOwner }) {
             </div>
           </div>
         </UserLink>
-        
+
         {/* Follow Button */}
         {userId !== profile.id && (
           <button
@@ -160,7 +168,7 @@ export default function ProfileHeaderLite({ profile, isOwner }) {
           >
             Edit
           </Link>
-        )}        
+        )}
       </div>
 
       {/* Bio */}

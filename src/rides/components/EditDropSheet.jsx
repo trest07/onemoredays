@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { compressImageFile, uploadToCloudflare } from "@/lib/uploadToCloudflare.js";
 import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 /** same key pattern as MapView composer */
 function omdMediaKey({ userId = "anon", originalName = "upload.jpg" } = {}) {
@@ -26,6 +27,7 @@ export default function EditDropSheet({ open, onClose, drop, onSave }) {
 
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     if (!open || !drop) return;
@@ -101,7 +103,8 @@ export default function EditDropSheet({ open, onClose, drop, onSave }) {
       await onSave(patch);
       onClose?.();
     } catch (e) {
-      alert(e?.message || "Failed to save changes");
+      // alert(e?.message || "Failed to save changes");
+      showAlert({ message: e?.message || "Failed to save changes", type: "warning" });
     } finally {
       setSaving(false);
     }

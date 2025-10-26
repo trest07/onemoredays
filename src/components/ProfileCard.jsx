@@ -7,6 +7,7 @@ import { fetchStopsForTrip, fetchTrips } from "../trips/lib/trips";
 import TripsPanel from "../trips/components/TripsPanel";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useAlert } from "../context/AlertContext";
 
 /** Small helper: initials from a name */
 function initials(name = "") {
@@ -39,6 +40,7 @@ export default function ProfileCard({
   const [trips, setTrips] = useState([]);
   const [showTrips, setShowTrips] = useState(false);
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
 
   const loadPhotos = async () => {
     if (!profileId) return;
@@ -135,7 +137,8 @@ export default function ProfileCard({
 
   // Handle follow/unfollow
   const handleFollowClick = async () => {
-    if (!userId) return alert("You must be logged in.");
+    if (!userId) //return alert("You must be logged in.");
+    showAlert({ message: "You must be logged in.", type: "warning" });
 
     setLoading(true);
     try {

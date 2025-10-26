@@ -1,6 +1,5 @@
 // src/rides/pages/settings/MyDrops.jsx
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/supabaseClient";
+import { useEffect, useState } from "react";
 import {
   fetchMyDropsWithStats, // ← stats view so the badges show
   updateDrop,
@@ -10,6 +9,7 @@ import RatingStars from "../../components/RatingStars";
 import CommentsSection from "../../components/CommentsSection";
 import Loading from "../../../components/Loading";
 import { useAuth } from "../../../context/AuthContext";
+import { useAlert } from "../../../context/AlertContext";
 
 /* ---------- Small card (clean, fixed thumbnail) ---------- */
 export function DropItem({ d, onDelete, onEdit, userId }) {
@@ -156,6 +156,7 @@ export default function MyDrops() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const { showAlert, showConfirm } = useAlert();
 
   // modal state
   const [editing, setEditing] = useState(null); // holds the drop object
@@ -165,11 +166,12 @@ export default function MyDrops() {
   // ✅ keep userId at component scope so JSX can use it
   const [userId, setUserId] = useState(null);
 
-  const { loggedUser } = useAuth();
+  const { loggedUser, authLoading } = useAuth();
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true);
+        if (authLoading) return;
+        // setLoading(true);
         setErr("");
         // const { data: u, error } = await supabase.auth.getUser();
         // if (error) throw error;
@@ -189,20 +191,29 @@ export default function MyDrops() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [loggedUser, authLoading]);
 
   async function onDelete(id) {
     if (!id) return;
-    if (!confirm("Delete this drop? This cannot be undone.")) return;
-    try {
-      setDeletingId(id);
-      await deleteDrop(id);
-      setRows((xs) => xs.filter((x) => x.id !== id));
-    } catch (e) {
-      alert(e?.message || "Failed to delete");
-    } finally {
-      setDeletingId("");
-    }
+    // if (!confirm("Delete this drop? This cannot be undone.")) return;
+    showConfirm({
+      message: "Delete this drop? This cannot be undone.",
+      onConfirm: async () => {
+        try {
+          setDeletingId(id);
+          await deleteDrop(id);
+          setRows((xs) => xs.filter((x) => x.id !== id));
+        } catch (e) {
+          // alert(e?.message || "Failed to delete");
+          showAlert({
+            message: e?.message || "Failed to delete",
+            type: "warning",
+          });
+        } finally {
+          setDeletingId("");
+        }
+      },
+    });
   }
 
   async function onSaveNote(noteText) {
@@ -215,7 +226,8 @@ export default function MyDrops() {
       );
       setEditing(null);
     } catch (e) {
-      alert(e?.message || "Failed to update");
+      // alert(e?.message || "Failed to update");
+      showAlert({ message: e?.message || "Failed to update", type: "warning" });
     } finally {
       setSaving(false);
     }

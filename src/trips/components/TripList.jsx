@@ -3,15 +3,17 @@ import { fetchTrips, deleteTrip } from "@/trips/lib/trips";
 import TripCard from "./TripCard";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
+import { useAlert } from "../../context/AlertContext";
 
 export default function TripList() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showAlert, showConfirm } = useAlert();
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const data = await fetchTrips({ limit: 100 });
         setTrips(data);
@@ -28,13 +30,22 @@ export default function TripList() {
   }
 
   async function handleDelete(tripId) {
-    if (!confirm("Delete this trip?")) return;
-    try {
-      deleteTrip(tripId);
-      setTrips((prev) => prev.filter((t) => t.id !== tripId));
-    } catch (err) {
-      alert("Failed to delete trip: " + err.message);
-    }
+    // if (!confirm("Delete this trip?")) return;
+    showConfirm({
+      message: "Delete this trip?",
+      onConfirm: async () => {
+        try {
+          deleteTrip(tripId);
+          setTrips((prev) => prev.filter((t) => t.id !== tripId));
+        } catch (err) {
+          // alert("Failed to delete trip: " + err.message);
+          showAlert({
+            message: "Failed to delete trip: " + err.message,
+            type: "warning",
+          });
+        }
+      },
+    });
   }
 
   return (

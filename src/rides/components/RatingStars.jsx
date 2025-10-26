@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
+import { useAlert } from "../../context/AlertContext";
 
 export default function RatingStars({ pinId, userId }) {
   const [rating, setRating] = useState(0);
   const [avgRating, setAvgRating] = useState(0);
   const [count, setCount] = useState(0);
   const [hover, setHover] = useState(0);
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     if (!pinId) return;
@@ -36,7 +38,8 @@ export default function RatingStars({ pinId, userId }) {
   }, [pinId, userId]);
 
   async function handleRate(value) {
-    if (!userId) return alert("Sign in to rate");
+    if (!userId) //return alert("Sign in to rate");
+    showAlert({ message: "Sign in to rate", type: "warning" });
     setRating(value);
 
     const { error } = await supabase

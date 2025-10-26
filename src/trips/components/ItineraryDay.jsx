@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { updateStop, deleteStop } from "@/trips/lib/trips";
+import { useAlert } from "../../context/AlertContext";
 
 export default function ItineraryDay({
   dayIndex,
@@ -9,6 +10,7 @@ export default function ItineraryDay({
 }) {
   const [editingId, setEditingId] = useState(null);
   const [text, setText] = useState("");
+  const { showConfirm } = useAlert();
 
   async function handleSave(stop) {
     await updateStop(stop.id, { title: text || stop.title });
@@ -19,7 +21,9 @@ export default function ItineraryDay({
   return (
     <div className="border rounded-lg p-3 bg-white shadow-sm">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-amber-600">Day {dayIndex + 1}</h4>
+        <h4 className="text-sm font-semibold text-amber-600">
+          Day {dayIndex + 1}
+        </h4>
         <div className="text-xs text-neutral-500">
           {stops.length} stop{stops.length > 1 ? "s" : ""}
         </div>
@@ -35,7 +39,10 @@ export default function ItineraryDay({
 
       <div className="mt-3 space-y-2">
         {stops.map((s) => (
-          <div key={s.id} className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50 shadow-sm">
+          <div
+            key={s.id}
+            className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50 shadow-sm"
+          >
             <div className="flex-1">
               {editingId === s.id ? (
                 <>
@@ -84,10 +91,17 @@ export default function ItineraryDay({
                 </button>
                 <button
                   onClick={async () => {
-                    if (confirm("Delete stop?")) {
-                      await deleteStop(s.id);
-                      refreshStops();
-                    }
+                    // if (confirm("Delete stop?")) {
+                    //   await deleteStop(s.id);
+                    //   refreshStops();
+                    // }
+                    showConfirm({
+                      message: "Delete stop?",
+                      onConfirm: async () => {
+                        await deleteStop(s.id);
+                        refreshStops();
+                      },
+                    });
                   }}
                   className="text-xs px-2 py-1 rounded border text-red-600 hover:bg-red-50 transition"
                 >

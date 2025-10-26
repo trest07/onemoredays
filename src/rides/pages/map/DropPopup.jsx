@@ -14,6 +14,7 @@ import InlineProfileCard from "@/rides/components/InlineProfileCard.jsx";
 import RatingStars from "@/rides/components/RatingStars.jsx";
 import CommentsSection from "@/rides/components/CommentsSection.jsx";
 import { useAuth } from "../../../context/AuthContext";
+import { useAlert } from "../../../context/AlertContext";
 
 /* ------------------------------ utils ------------------------------ */
 
@@ -176,6 +177,7 @@ export default function DropPopup({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { showAlert } = useAlert();
 
   // keep auth state in sync (fixes disabled buttons after login)
     const { loggedUser } = useAuth();
@@ -261,7 +263,8 @@ export default function DropPopup({
       if (old === 1) setUp((c) => c + 1);
       if (old === -1) setDown((c) => c + 1);
       setMyVote(old);
-      alert(e?.message || "Failed to vote");
+      // alert(e?.message || "Failed to vote");
+      showAlert({ message: e?.message || "Failed to vote", type: "warning" });
     }
   }
 
@@ -280,7 +283,8 @@ export default function DropPopup({
       if (!reason || !reason.trim()) return;
 
       if (!uid) {
-        alert("You must be signed in to report a pin.");
+        // alert("You must be signed in to report a pin.");
+        showAlert({ message:"You must be signed in to report a pin.", type: "warning" });
         return;
       }
 
@@ -290,9 +294,11 @@ export default function DropPopup({
         .insert([{ pin_id: id, reason: reason.trim(), reporter_id: uid }]);
 
       if (error) throw error;
-      alert("Thanks. We received your report.");
+      // alert("Thanks. We received your report.");
+      showAlert({ message:"Thanks. We received your report.", type: "success" });
     } catch (e) {
-      alert(e?.message || "Failed to submit report");
+      // alert(e?.message || "Failed to submit report");
+      showAlert({ message:e?.message || "Failed to submit report", type: "warning" });
     }
   }
 

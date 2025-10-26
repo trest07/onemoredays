@@ -9,6 +9,7 @@ import {
 import InlineProfileCard from "../../rides/components/InlineProfileCard";
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 // Simple card for a user
 function UserCard({
@@ -25,6 +26,7 @@ function UserCard({
   const [profileOpen, setProfileOpen] = useState(false);
   // const [userId, setUserId] = useState("");
   const [loggedUserId, setLoggedUserId] = useState(null);
+  const { showAlert } = useAlert();
 
   const { loggedUser } = useAuth();
   useEffect(() => {
@@ -51,7 +53,8 @@ function UserCard({
 
   // Handle follow/unfollow
   const handleFollowClick = async () => {
-    if (!userId) return alert("You must be logged in.");
+    if (!userId) //return alert("You must be logged in.");
+    showAlert({ message: "You must be logged in.", type: "warning" });
 
     setLoading(true);
     try {

@@ -23,7 +23,8 @@ export default function MapControls({ coords, topOffsetPx = 12 }) {
     e?.preventDefault?.()
     const term = q.trim()
     if (!term) return
-    setLoading(true); setResults([])
+    setLoading(true); 
+    setResults([])
     try {
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(term)}&limit=6&addressdetails=1`
       const res = await fetch(url, { headers: { Accept: 'application/json' } })
