@@ -9,6 +9,7 @@ import TripsPanel from "../../trips/components/TripsPanel.jsx";
 import ProfilePhotos from "../components/ProfilePhotos.jsx";
 import Loading from "../../components/Loading.jsx";
 import ConnectionsTab from "../components/ConnectionsTab.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 /**
  * Profile.jsx
@@ -21,31 +22,34 @@ export default function Profile() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const { loggedUser, authLoading } = useAuth();
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!loggedUser && !id) return;
     let mounted = true;
     (async () => {
-      setLoading(true);
       try {
         let data;
         if (id) {
           data = await getProfileById(id);
-          setIsOwner(false);
         } else {
           data = await getMyProfile();
-          setIsOwner(true);
         }
-        if (mounted) setProfile(data);
+        if (mounted) {
+          setProfile(data);
+          setIsOwner(loggedUser && data.id === loggedUser.id);
+        }
       } catch (e) {
         if (mounted) setError(e?.message || "Failed to load profile");
       } finally {
-        if (mounted) setLoading(false);
+        setLoading(false);
       }
     })();
     return () => {
       mounted = false;
     };
-  }, [id]);
+  }, [id, loggedUser, authLoading]);
 
   if (loading) return <Loading text="Loading profile…" />;
   if (error) return <div className="p-4 text-red-600">{error}</div>;
@@ -73,11 +77,11 @@ export default function Profile() {
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="photos">
-          <ProfilePhotos isOwner={isOwner} profile={profile}/>
+          <ProfilePhotos isOwner={isOwner} profile={profile} />
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="connections">
-          <ConnectionsTab profileId={profile.id} isOwner={isOwner}/>
+          <ConnectionsTab profileId={profile.id} isOwner={isOwner} />
         </ProfileTabs.Panel>
 
         <ProfileTabs.Panel tabKey="about">

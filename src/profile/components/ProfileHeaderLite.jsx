@@ -155,7 +155,7 @@ export default function ProfileHeaderLite({ profile, isOwner }) {
         {/* Edit button if owner */}
         {isOwner && (
           <Link
-            to="/profile/edit"
+            to="/settings"
             className="text-sm px-3 py-1 rounded border hover:bg-gray-50"
           >
             Edit

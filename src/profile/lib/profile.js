@@ -57,22 +57,28 @@ export async function toggleFollow(targetId, currentUserId) {
 
 // Resolve :id that could be a UUID or a username (with/without "@")
 export async function getProfileById(idOrUsername) {
-  const key = String(idOrUsername || "")
-    .trim()
-    .replace(/^@/, "");
+  const key = String(idOrUsername || "").trim().replace(/^@/, "");
+  if (!key) {
+    console.warn("getProfileById called with empty idOrUsername");
+    return null;
+  }
 
   // 1) Try by UUID
   let { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, username, photo_url, bio, created_at, banner_url")
+    .select(
+      "id, display_name, username, photo_url, bio, created_at, banner_url"
+    )
     .eq("id", key)
     .maybeSingle();
 
-  if (!data) {
-    // 2) Fallback to username
+  // 2) If not found, try by username
+  if (!data && !error) {
     const byUsername = await supabase
       .from("profiles")
-      .select("id, display_name, username, photo_url, bio, created_at")
+      .select(
+        "id, display_name, username, photo_url, bio, created_at, banner_url"
+      )
       .eq("username", key)
       .maybeSingle();
 
@@ -80,15 +86,21 @@ export async function getProfileById(idOrUsername) {
     data = byUsername.data || null;
   }
 
-  if (!data){
+  // 🚨 If still not found, abort early
+  if (!data) {
     if (error) throw error;
+    return null;
   }
-  
 
-  const counts = await fetchProfileStatsClient(data.id);
-  data = { ...data, ...counts };
+  // 3) Fetch stats safely
+  let counts = {};
+  try {
+    counts = await fetchProfileStatsClient(data.id);
+  } catch (statsError) {
+    console.warn("Failed to fetch profile stats:", statsError);
+  }
 
-  return data;
+  return { ...data, ...counts };
 }
 
 export async function fetchProfileStatsClient(userId) {
@@ -144,27 +156,34 @@ export async function getMyProfile() {
     .limit(1);
 
   if (error) throw error;
-  if (rows && rows.length) return rows[0];
+  let result;
+  if (rows && rows.length) {
+    //return rows[0];
+    result = rows[0];
+  } else {
+    // Create minimal profile if none exists
+    const username = (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(
+      /[^a-z0-9_]/gi,
+      ""
+    );
 
-  // Create minimal profile if none exists
-  const username = (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(
-    /[^a-z0-9_]/gi,
-    ""
-  );
+    const insert = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        username,
+        display_name: "",
+        bio: "",
+        photo_url: "/avatar.jpg",
+        discoverable: false,
+      })
+      .select("id, display_name, username, photo_url, bio, created_at")
+      .single();
 
-  const insert = await supabase
-    .from("profiles")
-    .insert({
-      id: user.id,
-      username,
-      display_name: "",
-      bio: "",
-      photo_url: "/avatar.jpg",
-      discoverable: false,
-    })
-    .select("id, display_name, username, photo_url, bio, created_at")
-    .single();
+    if (insert.error) throw insert.error;
+    result = insert.data;
+  }
 
-  if (insert.error) throw insert.error;
-  return insert.data;
+  const counts = await fetchProfileStatsClient(result.id);
+  return { ...result, ...counts };
 }
