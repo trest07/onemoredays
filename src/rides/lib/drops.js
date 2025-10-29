@@ -311,7 +311,7 @@ export async function recordView(pinId) {
       if (now - last < 12 * 60 * 60 * 1000) return // already reported recently
     } catch {}
     await withBackoff(() =>
-      supabase.rpc('record_pin_view', {
+      supabase.schema("omd").rpc('record_pin_view', {
         p_pin_id: pinId,
         p_device_id: device_id,
       })
@@ -334,7 +334,7 @@ export async function getViewCount(pinId) {
   if (_viewCountCache.has(pinId)) return _viewCountCache.get(pinId)
   try {
     const { data, error } = await withBackoff(() =>
-      supabase.rpc('get_pin_view_count', { p_pin_id: pinId })
+      supabase.schema("omd").rpc('get_pin_view_count', { p_pin_id: pinId })
     )
     if (error) throw error
     const n = Number(data || 0)
@@ -393,7 +393,7 @@ export async function fetchTopPosters({ limit = 5 } = {}) {
  * Compatibility shim so existing components can import:
  *   import { listDropsByProfile } from "../../rides/lib/drops.js";
  */
-export async function listDropsByProfile(profileId, opts = {}) {
+export async function listDropsByProfile(profileId) {
   if (!profileId) throw new Error('Missing profileId')
-  return fetchMyDrops({ userId: profileId, ...opts })
+  return fetchMyDrops({ userId: profileId })
 }

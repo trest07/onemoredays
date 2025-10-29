@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { listDropsByProfile } from "../../rides/lib/drops.js";
 import InlineProfileCard from "../../rides/components/InlineProfileCard.jsx";
 import DropPopup from "../../rides/pages/map/DropPopup.jsx";
+import { DropItem } from "../../rides/pages/settings/MyDrops.jsx";
+import Loading from "../../components/Loading.jsx";
 
 export default function ProfileDrops({ profileId }) {
   const [items, setItems] = useState(null);
@@ -23,7 +25,7 @@ export default function ProfileDrops({ profileId }) {
   }, [profileId]);
 
   if (err) return <div className="text-red-600">{err}</div>;
-  if (!items) return <div className="p-4">Loading…</div>;
+  if (!items) return <Loading text={"Loading…"}/>;
   if (!items.length) return <div className="p-4 text-gray-500">No drops yet.</div>;
 
   return (
@@ -35,7 +37,8 @@ export default function ProfileDrops({ profileId }) {
             timestamp={drop.created_at}
           />
           <div className="mt-2">
-            <DropPopup drop={drop} compact />
+            {/* <DropPopup drop={drop} compact /> */}
+            <DropItem key={drop.id} d={drop} userId={profileId} />
           </div>
         </div>
       ))}

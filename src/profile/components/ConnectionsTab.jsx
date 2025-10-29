@@ -8,6 +8,8 @@ import {
 } from "../../components/tabs";
 import InlineProfileCard from "../../rides/components/InlineProfileCard";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 // Simple card for a user
 function UserCard({
@@ -18,12 +20,21 @@ function UserCard({
   loading,
   userId,
   setLoading,
+  isOwner = true,
 }) {
   const [followStatus, setFollowStatus] = useState("none");
   const [profileOpen, setProfileOpen] = useState(false);
+  // const [userId, setUserId] = useState("");
+  const [loggedUserId, setLoggedUserId] = useState(null);
+  const { showAlert } = useAlert();
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     const loadFollowStatus = async () => {
+      // const { data: userData } = await supabase.auth.getUser();
+      const userIdNew = loggedUser?.id;
+      setLoggedUserId(userIdNew);
+
       const { data } = await supabase
         .schema("omd")
         .from("follow_requests")
@@ -42,7 +53,8 @@ function UserCard({
 
   // Handle follow/unfollow
   const handleFollowClick = async () => {
-    if (!userId) return alert("You must be logged in.");
+    if (!userId) //return alert("You must be logged in.");
+    showAlert({ message: "You must be logged in.", type: "warning" });
 
     setLoading(true);
     try {
@@ -115,7 +127,7 @@ function UserCard({
             Accept
           </button>
         )}
-        {onFollow && (
+        {onFollow && user.id !== loggedUserId && (
           <button
             type="button"
             disabled={loading}
@@ -140,7 +152,7 @@ function UserCard({
               : "Following"}
           </button>
         )}
-        {onRemove && (
+        {onRemove && isOwner && (
           <button
             onClick={() => onRemove(user)}
             className="px-3 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600"
@@ -170,23 +182,28 @@ function UserCard({
   );
 }
 
-export default function ConnectionsTab() {
+export default function ConnectionsTab({ profileId, isOwner = true }) {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(profileId || "");
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     (async () => {
       try {
-        const { data: userData, error: userErr } =
-          await supabase.auth.getUser();
+        let user;
+        if (!userId) {
+          // const { data: userData, error: userErr } =
+          //   await supabase.auth.getUser();
 
-        if (userErr) throw userErr;
-        const user = userData?.user;
-
+          // if (userErr) throw userErr;
+          user = loggedUser;
+        } else {
+          user = { id: userId };
+        }
         if (user?.id) {
           setUserId(user.id);
           loadConnections(user?.id);
@@ -311,7 +328,7 @@ export default function ConnectionsTab() {
         <TabsList className="flex justify-around bg-neutral-100 rounded-lg mb-3">
           <TabsTrigger value="followers">Followers</TabsTrigger>
           <TabsTrigger value="following">Following</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger>
+          {isOwner && <TabsTrigger value="requests">Requests</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="followers">
@@ -325,6 +342,7 @@ export default function ConnectionsTab() {
                 userId={userId}
                 loading={loading}
                 onRemove={handleRemove}
+                isOwner={isOwner}
               />
             ))
           ) : (
@@ -341,6 +359,7 @@ export default function ConnectionsTab() {
                 key={f.username}
                 user={f}
                 onRemove={handleRemoveFollowing}
+                isOwner={isOwner}
               />
             ))
           ) : (
@@ -358,6 +377,7 @@ export default function ConnectionsTab() {
                 user={r}
                 onAccept={handleAccept}
                 onRemove={handleRemove}
+                isOwner={isOwner}
               />
             ))
           ) : (

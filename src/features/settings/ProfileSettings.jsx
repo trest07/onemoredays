@@ -6,6 +6,8 @@ import {
   uploadToCloudflare,
 } from "@/lib/uploadToCloudflare";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 function profileImageKey(userId = "anon", originalName = "avatar.jpg") {
   const d = new Date();
@@ -27,6 +29,7 @@ export default function ProfileSettings() {
   const [bio, setBio] = useState("");
   const [photoUrl, setPhotoUrl] = useState("/avatar.jpg");
   const [saving, setSaving] = useState(false);
+  const { showAlert } = useAlert();
 
   const fileRef = useRef(null);
   const [file, setFile] = useState(null);
@@ -35,14 +38,15 @@ export default function ProfileSettings() {
     [file]
   );
 
+  const { loggedUser } = useAuth();
   useEffect(() => {
     let on = true;
     (async () => {
       try {
-        const { data: userData, error: userErr } =
-          await supabase.auth.getUser();
-        if (userErr) throw userErr;
-        const user = userData?.user;
+        // const { data: userData, error: userErr } =
+        //   await supabase.auth.getUser();
+        // if (userErr) throw userErr;
+        const user = loggedUser;
         if (!on) return;
         setUid(user?.id ?? null);
         setEmail(user?.email ?? "");
@@ -123,7 +127,8 @@ export default function ProfileSettings() {
 
       setPhotoUrl(nextPhotoUrl);
       setFile(null);
-      alert("Profile saved.");
+      // alert("Profile saved.");
+      showAlert({ message: "Profile saved.", type: "success" });
     } catch (e) {
       setErr(e?.message || "Failed to save profile");
     } finally {

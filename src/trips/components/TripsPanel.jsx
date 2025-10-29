@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { fetchTrips, fetchStopsForTrip } from "@/trips/lib/trips";
 import ItineraryDay from "./ItineraryDay";
 
-export default function TripsPanel({ profileId, showTrips }) {
+export default function TripsPanel({ profileId, showTrips = true }) {
   const [trips, setTrips] = useState([]);
   const [stopsByTrip, setStopsByTrip] = useState({});
   const [expandedTripId, setExpandedTripId] = useState(null);

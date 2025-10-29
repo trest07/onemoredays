@@ -58,26 +58,88 @@ export async function toggleFollow(targetId, currentUserId) {
 // Resolve :id that could be a UUID or a username (with/without "@")
 export async function getProfileById(idOrUsername) {
   const key = String(idOrUsername || "").trim().replace(/^@/, "");
+  if (!key) {
+    console.warn("getProfileById called with empty idOrUsername");
+    return null;
+  }
 
   // 1) Try by UUID
   let { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, username, photo_url, bio, created_at")
+    .select(
+      "id, display_name, username, photo_url, bio, created_at, banner_url"
+    )
     .eq("id", key)
     .maybeSingle();
 
-  if (error) throw error;
-  if (data) return data;
+  // 2) If not found, try by username
+  if (!data && !error) {
+    const byUsername = await supabase
+      .from("profiles")
+      .select(
+        "id, display_name, username, photo_url, bio, created_at, banner_url"
+      )
+      .eq("username", key)
+      .maybeSingle();
 
-  // 2) Fallback to username
-  const byUsername = await supabase
-    .from("profiles")
-    .select("id, display_name, username, photo_url, bio, created_at")
-    .eq("username", key)
-    .maybeSingle();
+    if (byUsername.error) throw byUsername.error;
+    data = byUsername.data || null;
+  }
 
-  if (byUsername.error) throw byUsername.error;
-  return byUsername.data || null;
+  // 🚨 If still not found, abort early
+  if (!data) {
+    if (error) throw error;
+    return null;
+  }
+
+  // 3) Fetch stats safely
+  let counts = {};
+  try {
+    counts = await fetchProfileStatsClient(data.id);
+  } catch (statsError) {
+    console.warn("Failed to fetch profile stats:", statsError);
+  }
+
+  return { ...data, ...counts };
+}
+
+export async function fetchProfileStatsClient(userId) {
+  const [
+    { count: followers },
+    { count: following },
+    { count: drops },
+    { count: trips },
+  ] = await Promise.all([
+    supabase
+      .schema("omd")
+      .from("follow_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("followed_id", userId)
+      .eq("status", "accepted"),
+    supabase
+      .schema("omd")
+      .from("follow_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", userId)
+      .eq("status", "accepted"),
+    supabase
+      .schema("omd")
+      .from("my_pins_list")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+    supabase
+      .schema("omd")
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId),
+  ]);
+
+  return {
+    followers_count: followers ?? 0,
+    following_count: following ?? 0,
+    drops_count: drops ?? 0,
+    trips_count: trips ?? 0,
+  };
 }
 
 // Current user's profile (creates a minimal row if missing)
@@ -94,25 +156,34 @@ export async function getMyProfile() {
     .limit(1);
 
   if (error) throw error;
-  if (rows && rows.length) return rows[0];
+  let result;
+  if (rows && rows.length) {
+    //return rows[0];
+    result = rows[0];
+  } else {
+    // Create minimal profile if none exists
+    const username = (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(
+      /[^a-z0-9_]/gi,
+      ""
+    );
 
-  // Create minimal profile if none exists
-  const username =
-    (user.email?.split("@")[0] || user.id.slice(0, 8)).replace(/[^a-z0-9_]/gi, "");
+    const insert = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        username,
+        display_name: "",
+        bio: "",
+        photo_url: "/avatar.jpg",
+        discoverable: false,
+      })
+      .select("id, display_name, username, photo_url, bio, created_at")
+      .single();
 
-  const insert = await supabase
-    .from("profiles")
-    .insert({
-      id: user.id,
-      username,
-      display_name: "",
-      bio: "",
-      photo_url: "/avatar.jpg",
-      discoverable: false,
-    })
-    .select("id, display_name, username, photo_url, bio, created_at")
-    .single();
+    if (insert.error) throw insert.error;
+    result = insert.data;
+  }
 
-  if (insert.error) throw insert.error;
-  return insert.data;
+  const counts = await fetchProfileStatsClient(result.id);
+  return { ...result, ...counts };
 }

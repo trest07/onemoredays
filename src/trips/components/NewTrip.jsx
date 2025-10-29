@@ -3,6 +3,8 @@ import { addTrip, updateTrip } from "@/trips/lib/trips";
 import { supabase } from "@/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
 import { uploadToCloudflare, compressImageFile } from "@/lib/uploadToCloudflare";
+import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 export default function NewTrip() {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ export default function NewTrip() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     if (editTrip) {
@@ -35,13 +38,14 @@ export default function NewTrip() {
     setPreview(URL.createObjectURL(f));
   }
 
+  const { loggedUser } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user?.user?.id) throw new Error("Not authenticated");
+      // const { data: user } = await supabase.auth.getUser();
+      if (!loggedUser?.id) throw new Error("Not authenticated");
 
       let imageUrl = preview;
       if (file) {
@@ -75,7 +79,8 @@ export default function NewTrip() {
         navigate(`/trips/${trip.id}`);
       }
     } catch (err) {
-      alert(err.message || "Failed to save trip");
+      // alert(err.message || "Failed to save trip");
+      showAlert({ message: err.message || "Failed to save trip", type: "warning" });
     } finally {
       setLoading(false);
     }

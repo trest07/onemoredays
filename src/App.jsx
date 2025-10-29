@@ -63,6 +63,7 @@ export default function App() {
 
             {/* Profile */}
             <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/edit" element={<EditProfile />} />
 
             {/* Wdrop (Trips) */}

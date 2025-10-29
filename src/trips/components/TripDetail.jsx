@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchTripById, fetchStopsForTrip, addStop } from "@/trips/lib/trips";
 import { useParams, useNavigate } from "react-router-dom";
 import ItineraryDay from "./ItineraryDay";
-import { supabase } from "@/supabaseClient";
 import Loading from "../../components/Loading";
+import { useAuth } from "../../context/AuthContext";
+import { useAlert } from "../../context/AlertContext";
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -11,10 +12,11 @@ export default function TripDetail() {
   const [stops, setStops] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const t = await fetchTripById(id);
         setTrip(t);
@@ -28,9 +30,11 @@ export default function TripDetail() {
     })();
   }, [id]);
 
+    const { loggedUser } = useAuth();
   async function handleAddStop(dayIndex = 0) {
-    const { data: user } = await supabase.auth.getUser();
-    if (!user?.user?.id) return alert("Login required");
+    // const { data: user } = await supabase.auth.getUser();
+    if (!loggedUser?.id) //return alert("Login required");
+    showAlert({ message: "Login required", type: "warning" });
     try {
       const newStop = await addStop({
         trip_id: id,
@@ -41,7 +45,8 @@ export default function TripDetail() {
       setStops((prev) => [...prev, newStop]);
     } catch (e) {
       console.error(e);
-      alert("Failed to add stop");
+      // alert("Failed to add stop");
+      showAlert({ message: "Failed to add stop", type: "warning" });
     }
   }
 
