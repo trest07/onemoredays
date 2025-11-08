@@ -1,6 +1,7 @@
 // src/components/TopNav.jsx
 import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
+import NotificationIcon from "../notifications/components/NotificationIcon"
 
 const DAYS_PER_DOLLAR = 7
 
@@ -99,6 +100,7 @@ export default function TopNav() {
           </div>
 
           {/* Right: Countdown */}
+          <div className="flex items-center space-x-8">
           <div className="flex flex-col items-end">
             <div className="text-xs sm:text-sm text-gray-700 font-mono px-3 py-1 rounded-lg border bg-white/80">
               {destroyed ? (
@@ -118,8 +120,13 @@ export default function TopNav() {
             <div className="text-[10px] sm:text-xs text-gray-500">
               Rule: 1 → +7 days
             </div>
+            
           </div>
+          <NotificationIcon />
+          </div>
+          
         </div>
+        
       </div>
     </header>
   )

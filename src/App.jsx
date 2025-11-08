@@ -32,6 +32,9 @@ const TripList = lazy(() => import("@/trips/components/TripList.jsx"));
 const NewTrip = lazy(() => import("@/trips/components/NewTrip.jsx"));
 const TripDetail = lazy(() => import("@/trips/components/TripDetail.jsx"));
 
+
+const Notifications = lazy(() => import("@/notifications/pages/NotificationsPage.jsx"));
+
 // function Loading() {
 //   return <Loading className="w-full py-10 text-center text-gray-500"/>;
 // }
@@ -89,6 +92,10 @@ export default function App() {
             <Route path="/trips" element={<TripList />} />
             <Route path="/trips/new" element={<NewTrip />} />
             <Route path="/trips/:id" element={<TripDetail />} />
+
+              {/* Notifications */}
+            <Route path="/notifications" element={<Notifications />} />
+
 
             {/* Default & fallback */}
             <Route path="/" element={<Navigate to="/rides/map" replace />} />
